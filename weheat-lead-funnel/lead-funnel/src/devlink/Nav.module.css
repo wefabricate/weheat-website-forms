@@ -1,0 +1,153 @@
+.nav {
+  position: fixed;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: auto;
+  z-index: 999;
+
+  display: flex;
+  width: 100%;
+  height: 5vw;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+
+  border-bottom: 1px solid hsla(0, 0.00%, 0.00%, 0.20);
+
+  background-color: white;
+
+  color: var(--white-dfe063b9);
+
+  object-fit: fill;
+}
+
+@media screen and (max-width: 991px) {
+  .nav {
+    height: 60px;
+  }
+}
+
+.container {
+  position: relative;
+  z-index: 3;
+
+  display: flex;
+  width: 80vw;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media screen and (max-width: 991px) {
+  .container {
+    width: 90vw;
+  }
+}
+
+.container.hspread {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.heading-2 {
+  color: var(--light-sky-blue);
+}
+
+@media screen and (max-width: 479px) {
+  .heading-2 {
+    font-size: 30px;
+  }
+}
+
+.cookieconsent {
+  position: fixed;
+  left: 0%;
+  top: auto;
+  right: 0%;
+  bottom: 0%;
+
+  display: none;
+  width: 100svw;
+  height: auto;
+  padding: 1vw 2vw;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  align-self: flex-start;
+  flex: 1;
+
+  background-color: white;
+}
+
+@media screen and (max-width: 991px) {
+  .cookieconsent {
+    height: auto;
+    padding-right: 2vw;
+    padding-bottom: 2vw;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .cookieconsent {
+    display: none;
+  }
+}
+
+.text-block-2 {
+  display: block;
+  color: hsla(0, 0.00%, 0.00%, 1.00);
+}
+
+.button-3 {
+  display: flex;
+  padding: 0.8vw 2vw;
+  justify-content: space-between;
+  align-items: center;
+  order: 1;
+
+  border: 1px solid white;
+  border-radius: 500px;
+
+  background-color: transparent;
+
+  transition: all 300ms ease;
+
+  color: white;
+  font-size: 1vw;
+  line-height: 100%;
+  font-weight: 500;
+  text-align: center;
+}
+
+.button-3:hover {
+  border-color: hsla(204.00000000000003, 59.32%, 76.86%, 1.00);
+  background-color: hsla(204.00000000000003, 59.32%, 76.86%, 1.00);
+  transform: translate(0px, -2px);
+  color: hsla(0, 0.00%, 0.00%, 1.00);
+}
+
+@media screen and (max-width: 991px) {
+  .button-3 {
+    padding: 12px 25px;
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .button-3:hover {
+    border-color: hsla(204.00000000000003, 0.00%, 100.00%, 1.00);
+    background-color: transparent;
+    transform: none;
+    color: white;
+  }
+}
+
+.button-3.black {
+  border-color: hsla(0, 0.00%, 0.00%, 1.00);
+  background-color: hsla(0, 0.00%, 0.00%, 1.00);
+}
+
+.button-3.black:hover {
+  background-color: transparent;
+}
