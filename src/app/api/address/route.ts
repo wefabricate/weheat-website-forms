@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Map Dutch house type names to form values
+function mapHouseType(dutchType: string): 'detached' | 'semi-detached' | 'terraced' | 'apartment' | '' {
+    const type = dutchType.toLowerCase();
+    if (type.includes('vrijstaand')) return 'detached';
+    if (type.includes('2 onder 1 kap') || type.includes('twee-onder-een-kap')) return 'semi-detached';
+    if (type.includes('tussen') || type.includes('rijtjes')) return 'terraced';
+    if (type.includes('appartement')) return 'apartment';
+    return '';
+}
+
 // Mock address database
 const mockAddresses: Record<string, any> = {
     '6531KJ_4': {
@@ -103,5 +113,8 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('SUCCESS: Found address:', address);
-    return NextResponse.json(address);
+    return NextResponse.json({
+        ...address,
+        house_type_mapped: mapHouseType(address.house_type)
+    });
 }

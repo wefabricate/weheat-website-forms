@@ -42,6 +42,7 @@ export const MultiStepForm = () => {
                     latitude: string;
                     longitude: string;
                     woz: string;
+                    house_type_mapped: 'detached' | 'semi-detached' | 'terraced' | 'apartment' | '';
                 };
                 updateFormData({
                     area: data.area,
@@ -51,7 +52,8 @@ export const MultiStepForm = () => {
                     latitude: data.latitude,
                     longitude: data.longitude,
                     woz: data.woz,
-                    buildYear: data.build_year
+                    buildYear: data.build_year,
+                    houseType: data.house_type_mapped
                 });
             }
         } catch (error) {
@@ -111,11 +113,9 @@ export const MultiStepForm = () => {
                 // Data review step - always valid (data is prefilled)
                 return true;
             case 3:
-                return !!(formData.houseType && formData.buildYear && formData.insulation);
+                return !!(formData.insulation);
             case 4:
-                if (!formData.currentHeating) return false;
-                if (formData.currentHeating === 'gas' && !formData.gasUsage) return false;
-                return true;
+                return !!(formData.heatDistribution && formData.heatDistribution.length > 0);
             case 5:
                 return !!(formData.firstName && formData.lastName && formData.email && formData.phone);
             default:

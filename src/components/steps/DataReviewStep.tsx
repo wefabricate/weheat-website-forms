@@ -1,13 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FormData } from '../../types/form';
-import { CheckCircle, Home, Zap, Euro, MapPin } from 'lucide-react';
+import { CheckCircle, Home, Zap, MapPin, Edit2, Check } from 'lucide-react';
+import { Input } from '../ui/Input';
+import { Card } from '../ui/Card';
 
 interface DataReviewStepProps {
     formData: FormData;
     updateFormData: (data: Partial<FormData>) => void;
 }
 
-export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData }) => {
+export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, updateFormData }) => {
+    const [isEditing, setIsEditing] = useState(false);
+
+    const houseTypes = [
+        { id: 'detached', label: 'Vrijstaand' },
+        { id: 'semi-detached', label: 'Twee-onder-een-kap' },
+        { id: 'terraced', label: 'Rijtjeshuis' },
+        { id: 'apartment', label: 'Appartement' },
+    ];
+
+    const getHouseTypeLabel = (type: string) => {
+        return houseTypes.find(t => t.id === type)?.label || '-';
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center mb-8">
@@ -32,42 +47,115 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData }) => {
                     </div>
                 </div>
 
-                {/* Property Details */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Home className="w-4 h-4 text-primary-600" />
-                            <p className="text-sm font-medium text-gray-600">Bouwjaar</p>
-                        </div>
-                        <p className="text-lg font-bold text-gray-900">{formData.buildYear || '-'}</p>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Home className="w-4 h-4 text-primary-600" />
-                            <p className="text-sm font-medium text-gray-600">Oppervlakte</p>
-                        </div>
-                        <p className="text-lg font-bold text-gray-900">{formData.area ? `${formData.area} m²` : '-'}</p>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Zap className="w-4 h-4 text-primary-600" />
-                            <p className="text-sm font-medium text-gray-600">Energielabel</p>
-                        </div>
-                        <p className="text-lg font-bold text-gray-900">{formData.energyLabel || '-'}</p>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Euro className="w-4 h-4 text-primary-600" />
-                            <p className="text-sm font-medium text-gray-600">WOZ-waarde</p>
-                        </div>
-                        <p className="text-lg font-bold text-gray-900">
-                            {formData.woz ? `€ ${parseInt(formData.woz).toLocaleString('nl-NL')}` : '-'}
-                        </p>
-                    </div>
+                {/* Edit Button */}
+                <div className="flex justify-end">
+                    <button
+                        onClick={() => setIsEditing(!isEditing)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors"
+                    >
+                        {isEditing ? (
+                            <>
+                                <Check className="w-4 h-4" />
+                                Klaar met bewerken
+                            </>
+                        ) : (
+                            <>
+                                <Edit2 className="w-4 h-4" />
+                                Gegevens aanpassen
+                            </>
+                        )}
+                    </button>
                 </div>
+
+                {/* Property Details */}
+                {isEditing ? (
+                    <div className="space-y-4">
+                        {/* House Type Selection */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Type woning</label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {houseTypes.map((type) => (
+                                    <Card
+                                        key={type.id}
+                                        selected={formData.houseType === type.id}
+                                        onClick={() => updateFormData({ houseType: type.id as any })}
+                                        className="text-center py-3 cursor-pointer"
+                                    >
+                                        <span className="text-sm font-medium">{type.label}</span>
+                                    </Card>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Build Year */}
+                        <Input
+                            label="Bouwjaar"
+                            type="number"
+                            placeholder="bijv. 1990"
+                            value={formData.buildYear}
+                            onChange={(e) => updateFormData({ buildYear: e.target.value })}
+                        />
+
+                        {/* Area */}
+                        <Input
+                            label="Oppervlakte (m²)"
+                            type="number"
+                            placeholder="bijv. 150"
+                            value={formData.area || ''}
+                            onChange={(e) => updateFormData({ area: e.target.value })}
+                        />
+
+                        {/* Energy Label */}
+                        <Input
+                            label="Energielabel"
+                            type="text"
+                            placeholder="bijv. C"
+                            maxLength={2}
+                            value={formData.energyLabel || ''}
+                            onChange={(e) => updateFormData({ energyLabel: e.target.value.toUpperCase() })}
+                        />
+
+
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white rounded-xl p-4 border border-gray-100">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Home className="w-4 h-4 text-primary-600" />
+                                <p className="text-sm font-medium text-gray-600">Type woning</p>
+                            </div>
+                            <p className="text-lg font-bold text-gray-900">
+                                {getHouseTypeLabel(formData.houseType)}
+                            </p>
+                        </div>
+
+                        <div className="bg-white rounded-xl p-4 border border-gray-100">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Home className="w-4 h-4 text-primary-600" />
+                                <p className="text-sm font-medium text-gray-600">Bouwjaar</p>
+                            </div>
+                            <p className="text-lg font-bold text-gray-900">{formData.buildYear || '-'}</p>
+                        </div>
+
+                        <div className="bg-white rounded-xl p-4 border border-gray-100">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Home className="w-4 h-4 text-primary-600" />
+                                <p className="text-sm font-medium text-gray-600">Oppervlakte</p>
+                            </div>
+                            <p className="text-lg font-bold text-gray-900">{formData.area ? `${formData.area} m²` : '-'}</p>
+                        </div>
+
+                        <div className="bg-white rounded-xl p-4 border border-gray-100">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Zap className="w-4 h-4 text-primary-600" />
+                                <p className="text-sm font-medium text-gray-600">Energielabel</p>
+                            </div>
+                            <p className="text-lg font-bold text-gray-900">{formData.energyLabel || '-'}</p>
+                        </div>
+
+
+                    </div>
+                )}
 
                 {/* Energy Usage */}
                 {(formData.estimatedEnergyUsage || formData.estimatedGasUsage) && (

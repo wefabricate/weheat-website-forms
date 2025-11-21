@@ -21,8 +21,7 @@ export interface FormData {
     insulation: 'poor' | 'average' | 'good' | 'excellent' | '';
 
     // Step 3: Heating System
-    currentHeating: 'gas' | 'electric' | 'oil' | 'district' | '';
-    gasUsage?: string;
+    heatDistribution: ('radiators' | 'floor-heating' | 'air-heating' | 'combination')[];
 
     // Step 4: Contact
     firstName: string;
@@ -38,7 +37,7 @@ export const initialFormData: FormData = {
     houseType: '',
     buildYear: '',
     insulation: '',
-    currentHeating: '',
+    heatDistribution: [],
     firstName: '',
     lastName: '',
     email: '',
