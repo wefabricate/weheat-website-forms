@@ -19,8 +19,8 @@ export const Card: React.FC<CardProps> = ({
             className={`
         p-6 rounded-xl border-2 cursor-pointer text-gray-900 transition-all duration-200
         ${selected
-                    ? 'border-blue-600 bg-blue-50 ring-4 ring-blue-600/10'
-                    : 'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
+                    ? 'border-primary-600 bg-primary-50 ring-4 ring-primary-600/10'
+                    : 'border-gray-100 bg-white hover:border-primary-200 hover:shadow-md'
                 }
         ${className}
       `}

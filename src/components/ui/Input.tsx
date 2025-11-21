@@ -34,7 +34,7 @@ export const Input: React.FC<InputProps> = ({
             ${Icon ? 'pl-12 pr-4 py-3' : 'px-4 py-3'}
             ${error
                             ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10'
-                            : 'border-gray-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 hover:border-gray-200'
+                            : 'border-gray-100 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 hover:border-gray-200'
                         }
             ${className}
           `}

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { FormData, initialFormData } from '../types/form';
 import { LocationStep } from './steps/LocationStep';
+import { DataReviewStep } from './steps/DataReviewStep';
 import { HomeDetailsStep } from './steps/HomeDetailsStep';
 import { HeatingSystemStep } from './steps/HeatingSystemStep';
 import { ContactStep } from './steps/ContactStep';
@@ -15,14 +16,56 @@ export const MultiStepForm = () => {
     const [formData, setFormData] = useState<FormData>(initialFormData);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [isFetchingData, setIsFetchingData] = useState(false);
 
-    const totalSteps = 4;
+    const totalSteps = 5;
 
-    const updateFormData = (data: Partial<FormData>) => {
+    const updateFormData = React.useCallback((data: Partial<FormData>) => {
         setFormData(prev => ({ ...prev, ...data }));
+    }, []);
+
+    const fetchAddressData = async () => {
+        setIsFetchingData(true);
+        try {
+            const cleanPostalCode = formData.postalCode.replace(/\s/g, '');
+            const response = await fetch(
+                `app/api/address?postal_code=${cleanPostalCode}&house_number=${formData.houseNumber}`
+            );
+
+            if (response.ok) {
+                const data = await response.json() as {
+                    area: string;
+                    build_year: string;
+                    energy_label: string;
+                    estimated_energy_usage: number;
+                    estimated_gas_usage: number;
+                    latitude: string;
+                    longitude: string;
+                    woz: string;
+                };
+                updateFormData({
+                    area: data.area,
+                    energyLabel: data.energy_label,
+                    estimatedEnergyUsage: data.estimated_energy_usage,
+                    estimatedGasUsage: data.estimated_gas_usage,
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    woz: data.woz,
+                    buildYear: data.build_year
+                });
+            }
+        } catch (error) {
+            console.error('Failed to fetch address data:', error);
+        } finally {
+            setIsFetchingData(false);
+        }
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
+        if (currentStep === 1) {
+            // Fetch address data before moving to step 2
+            await fetchAddressData();
+        }
         if (currentStep < totalSteps) {
             setCurrentStep(prev => prev + 1);
         }
@@ -49,16 +92,36 @@ export const MultiStepForm = () => {
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle className="w-10 h-10 text-green-600" />
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Thank you!</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Bedankt!</h2>
                 <p className="text-xl text-gray-600 mb-8">
-                    We have received your details. One of our experts will contact you shortly with a personalized quote.
+                    We hebben je gegevens ontvangen. Een van onze experts neemt binnenkort contact met je op met een persoonlijke offerte.
                 </p>
                 <Button onClick={() => window.location.reload()}>
-                    Start New Calculation
+                    Nieuwe berekening starten
                 </Button>
             </div>
         );
     }
+
+    const isStepValid = () => {
+        switch (currentStep) {
+            case 1:
+                return !!(formData.postalCode && formData.houseNumber && formData.street && formData.city);
+            case 2:
+                // Data review step - always valid (data is prefilled)
+                return true;
+            case 3:
+                return !!(formData.houseType && formData.buildYear && formData.insulation);
+            case 4:
+                if (!formData.currentHeating) return false;
+                if (formData.currentHeating === 'gas' && !formData.gasUsage) return false;
+                return true;
+            case 5:
+                return !!(formData.firstName && formData.lastName && formData.email && formData.phone);
+            default:
+                return false;
+        }
+    };
 
     return (
         <div className="max-w-2xl mx-auto">
@@ -73,12 +136,15 @@ export const MultiStepForm = () => {
                             <LocationStep formData={formData} updateFormData={updateFormData} />
                         )}
                         {currentStep === 2 && (
-                            <HomeDetailsStep formData={formData} updateFormData={updateFormData} />
+                            <DataReviewStep formData={formData} updateFormData={updateFormData} />
                         )}
                         {currentStep === 3 && (
-                            <HeatingSystemStep formData={formData} updateFormData={updateFormData} />
+                            <HomeDetailsStep formData={formData} updateFormData={updateFormData} />
                         )}
                         {currentStep === 4 && (
+                            <HeatingSystemStep formData={formData} updateFormData={updateFormData} />
+                        )}
+                        {currentStep === 5 && (
                             <ContactStep formData={formData} updateFormData={updateFormData} />
                         )}
                     </div>
@@ -90,16 +156,16 @@ export const MultiStepForm = () => {
                             disabled={currentStep === 1}
                             className={currentStep === 1 ? 'invisible' : ''}
                         >
-                            Back
+                            Terug
                         </Button>
 
                         {currentStep < totalSteps ? (
-                            <Button onClick={handleNext}>
-                                Next Step
+                            <Button onClick={handleNext} disabled={!isStepValid() || isFetchingData}>
+                                {isFetchingData ? 'Gegevens ophalen...' : 'Volgende stap'}
                             </Button>
                         ) : (
-                            <Button onClick={handleSubmit} disabled={isSubmitting}>
-                                {isSubmitting ? 'Sending...' : 'Get Quote'}
+                            <Button onClick={handleSubmit} disabled={isSubmitting || !isStepValid()}>
+                                {isSubmitting ? 'Verzenden...' : 'Offerte aanvragen'}
                             </Button>
                         )}
                     </div>

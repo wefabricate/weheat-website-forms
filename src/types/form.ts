@@ -6,6 +6,15 @@ export interface FormData {
     street?: string;
     city?: string;
 
+    // API enriched data
+    area?: string;
+    energyLabel?: string;
+    estimatedEnergyUsage?: number;
+    estimatedGasUsage?: number;
+    latitude?: string;
+    longitude?: string;
+    woz?: string;
+
     // Step 2: Home Details
     houseType: 'detached' | 'semi-detached' | 'terraced' | 'apartment' | '';
     buildYear: string;
