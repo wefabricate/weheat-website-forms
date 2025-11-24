@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { FormData } from '../../types/form';
-import { CheckCircle, Home, Zap, MapPin, Edit2, Check, AlertCircle } from 'lucide-react';
+import { CheckCircle, Home, Zap, MapPin, Edit2, Check, AlertCircle, Flame } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Card } from '../ui/Card';
 import { EnergyLabel } from '../ui/EnergyLabel';
@@ -24,10 +24,20 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
     }, [hasApiData]);
 
     const houseTypes = [
-        { id: 'detached', label: 'Vrijstaand' },
-        { id: 'semi-detached', label: 'Twee-onder-een-kap' },
-        { id: 'terraced', label: 'Rijtjeshuis' },
-        { id: 'apartment', label: 'Appartement' },
+        { id: 'vrijstaande_woning', label: 'Vrijstaande woning' },
+        { id: '2_onder_1_kap_woning', label: '2 onder 1 kap woning' },
+        { id: 'geschakelde_2_onder_1_kapwoning', label: 'Geschakelde 2 onder 1 kapwoning' },
+        { id: 'geschakelde_woning', label: 'Geschakelde woning' },
+        { id: 'tussen_rijwoning', label: 'Tussen/rijwoning' },
+        { id: 'hoekwoning', label: 'Hoekwoning' },
+        { id: 'eindwoning', label: 'Eindwoning' },
+        { id: 'galerijflat', label: 'Galerijflat' },
+        { id: 'portiekflat', label: 'Portiekflat' },
+        { id: 'corridorflat', label: 'Corridorflat' },
+        { id: 'maisonnette', label: 'Maisonnette' },
+        { id: 'benedenwoning', label: 'Benedenwoning' },
+        { id: 'bovenwoning', label: 'Bovenwoning' },
+        { id: 'portiekwoning', label: 'Portiekwoning' },
     ];
 
     const getHouseTypeLabel = (type: string) => {
@@ -85,18 +95,19 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
                         {/* House Type Selection */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Type woning</label>
-                            <div className="grid grid-cols-2 gap-2">
+                            <select
+                                value={formData.houseType}
+                                onChange={(e) => updateFormData({ houseType: e.target.value as any })}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all appearance-none bg-white"
+                                style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '0.65em auto' }}
+                            >
+                                <option value="">Selecteer woningtype</option>
                                 {houseTypes.map((type) => (
-                                    <Card
-                                        key={type.id}
-                                        selected={formData.houseType === type.id}
-                                        onClick={() => updateFormData({ houseType: type.id as any })}
-                                        className="text-center py-3 cursor-pointer"
-                                    >
-                                        <span className="text-sm font-medium">{type.label}</span>
-                                    </Card>
+                                    <option key={type.id} value={type.id}>
+                                        {type.label}
+                                    </option>
                                 ))}
-                            </div>
+                            </select>
                         </div>
 
                         {/* Build Year */}
@@ -189,21 +200,23 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
                         </div>
 
                         <div className="bg-white rounded-xl p-4 border border-gray-100">
-                            <p className="text-sm font-medium text-gray-600 mb-3">Geschat verbruik per jaar</p>
-                            <div className="grid grid-cols-2 gap-4">
-                                {formData.estimatedEnergyUsage && (
-                                    <div>
-                                        <p className="text-xs text-gray-700">Elektriciteit</p>
-                                        <p className="text-lg font-bold text-gray-900">{formData.estimatedEnergyUsage} kWh</p>
-                                    </div>
-                                )}
-                                {formData.estimatedGasUsage && (
-                                    <div>
-                                        <p className="text-xs text-gray-700">Gas</p>
-                                        <p className="text-lg font-bold text-gray-900">{formData.estimatedGasUsage} m³</p>
-                                    </div>
-                                )}
+                            <div className="flex items-center gap-2 mb-2">
+                                <Zap className="w-4 h-4 text-primary-600" />
+                                <p className="text-sm font-medium text-gray-600">Stroomverbruik</p>
                             </div>
+                            <p className="text-lg font-bold text-gray-900">
+                                {formData.estimatedEnergyUsage ? `${formData.estimatedEnergyUsage} kWh` : '-'}
+                            </p>
+                        </div>
+
+                        <div className="bg-white rounded-xl p-4 border border-gray-100">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Flame className="w-4 h-4 text-primary-600" />
+                                <p className="text-sm font-medium text-gray-600">Gasverbruik</p>
+                            </div>
+                            <p className="text-lg font-bold text-gray-900">
+                                {formData.estimatedGasUsage ? `${formData.estimatedGasUsage} m³` : '-'}
+                            </p>
                         </div>
 
                     </div>

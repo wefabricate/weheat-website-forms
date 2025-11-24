@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormData } from '../../types/form';
 import { Input } from '../ui/Input';
 import { User, Mail, Phone, Send, PartyPopper } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 interface ContactStepProps {
     formData: FormData;
@@ -16,6 +17,50 @@ export const ContactStep: React.FC<ContactStepProps> = ({
     errors = {},
     validateField
 }) => {
+    useEffect(() => {
+        // Trigger confetti when the component mounts
+        const count = 200;
+
+        // Calculate origin based on viewport - center of left column on desktop
+        const isMobile = window.innerWidth < 768;
+        const defaults = {
+            origin: {
+                x: isMobile ? 0.5 : 0.25, // Center of left column (25% of viewport) on desktop
+                y: 0.7
+            }
+        };
+
+        function fire(particleRatio: number, opts: any) {
+            confetti({
+                ...defaults,
+                ...opts,
+                particleCount: Math.floor(count * particleRatio)
+            });
+        }
+
+        fire(0.25, {
+            spread: 26,
+            startVelocity: 55,
+        });
+        fire(0.2, {
+            spread: 60,
+        });
+        fire(0.35, {
+            spread: 100,
+            decay: 0.91,
+            scalar: 0.8
+        });
+        fire(0.1, {
+            spread: 120,
+            startVelocity: 25,
+            decay: 0.92,
+            scalar: 1.2
+        });
+        fire(0.1, {
+            spread: 120,
+            startVelocity: 45,
+        });
+    }, []);
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center mb-8 mt-12">

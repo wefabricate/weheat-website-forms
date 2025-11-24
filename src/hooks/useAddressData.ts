@@ -17,7 +17,7 @@ export const useAddressData = () => {
     const [isFetching, setIsFetching] = useState(false);
     const [hasData, setHasData] = useState<boolean | null>(null);
 
-    const fetchAddressData = async (postalCode: string, houseNumber: string, updateFormData: (data: Partial<FormData>) => void) => {
+    const fetchAddressData = async (postalCode: string, houseNumber: string, houseNumberAddition: string | undefined, updateFormData: (data: Partial<FormData>) => void) => {
         setIsFetching(true);
         setHasData(null);
 
@@ -25,11 +25,19 @@ export const useAddressData = () => {
         const minDuration = 2000; // Minimum 2 seconds loading time
 
         try {
-            const cleanPostalCode = postalCode.replace(/\s/g, '');
-
             // Run fetch and delay in parallel
             const [response] = await Promise.all([
-                fetch(`app/api/address?postal_code=${cleanPostalCode}&house_number=${houseNumber}`),
+                fetch('https://apim-website-prod-weu-01.azure-api.net/house-information', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        postal_code: postalCode,
+                        house_number: parseInt(houseNumber),
+                        ...(houseNumberAddition ? { house_number_addition: houseNumberAddition } : {}),
+                    }),
+                }),
                 new Promise(resolve => setTimeout(resolve, minDuration))
             ]);
 

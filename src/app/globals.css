@@ -1,6 +1,7 @@
 @layer properties, theme, base, webflow, components, utilities;
 
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
 
 :root {
   --background: #F5EFE2;
