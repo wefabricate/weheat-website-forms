@@ -3,7 +3,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #F5EFE2;
   --foreground: #171717;
 }
 
@@ -12,6 +12,14 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-sharp: var(--font-sharp);
+
+  --color-offwhite-50: rgb(255, 247, 237);
+  --color-offwhite-100: rgb(255, 237, 213);
+  --color-offwhite-200: rgb(255, 216, 168);
+  --color-offwhite-500: rgb(254, 134, 20);
+  --color-offwhite-600: rgb(254, 134, 20);
+  --color-offwhite-700: rgb(230, 115, 10);
 
   /* Custom orange highlight color */
   --color-primary-50: rgb(255, 247, 237);
@@ -22,15 +30,19 @@
   --color-primary-700: rgb(230, 115, 10);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* Dark mode removed to enforce brand identity */
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-sharp), sans-serif;
 }

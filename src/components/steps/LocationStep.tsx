@@ -1,8 +1,8 @@
 import React from 'react';
 import { FormData } from '../../types/form';
 import { Input } from '../ui/Input';
-
 import { MapPin, Check } from 'lucide-react';
+import { useAddressValidation } from '../../hooks/useAddressValidation';
 
 interface LocationStepProps {
     formData: FormData;
@@ -10,96 +10,81 @@ interface LocationStepProps {
 }
 
 export const LocationStep: React.FC<LocationStepProps> = ({ formData, updateFormData }) => {
-    const [isValidating, setIsValidating] = React.useState(false);
-    const [error, setError] = React.useState<string | null>(null);
+    const { isValidating, error, address } = useAddressValidation(formData.postalCode, formData.houseNumber);
 
     React.useEffect(() => {
-        const validateAddress = async () => {
-            const cleanPostalCode = formData.postalCode.replace(/\s/g, '');
-
-            if (cleanPostalCode.length === 6 && formData.houseNumber) {
-                setIsValidating(true);
-                setError(null);
-
-                try {
-                    const url = new URL('https://api.pdok.nl/bzk/locatieserver/search/v3_1/free');
-                    url.searchParams.set('q', `${cleanPostalCode} ${formData.houseNumber}`);
-                    url.searchParams.set('fq', 'type:adres');
-                    url.searchParams.append('fq', `postcode:${cleanPostalCode}`);
-                    url.searchParams.append('fq', `huisnummer:${formData.houseNumber}`);
-                    url.searchParams.set('rows', '1');
-                    url.searchParams.set('fl', 'straatnaam,huisnummer,huisletter,huisnummertoevoeging,woonplaatsnaam');
-
-                    console.log('Fetching URL:', url.toString());
-                    const response = await fetch(url.toString());
-
-                    if (!response.ok) throw new Error('Failed to fetch address');
-
-                    const data = await response.json() as { response: { numFound: number; docs: Array<{ straatnaam: string; woonplaatsnaam: string; weergavenaam: string; score: number }> } };
-                    console.log('PDOK Response:', data);
-
-                    if (data.response.numFound > 0) {
-                        const address = data.response.docs[0];
-                        updateFormData({
-                            street: address.straatnaam,
-                            city: address.woonplaatsnaam
-                        });
-                    } else {
-                        setError('Address not found');
-                        updateFormData({ street: '', city: '' });
-                    }
-                } catch (err) {
-                    console.error('Address validation error:', err);
-                    setError('Could not verify address');
-                    updateFormData({ street: '', city: '' });
-                } finally {
-                    setIsValidating(false);
-                }
-            } else {
-                // Clear address if inputs are incomplete
-                if (formData.street || formData.city || error) {
-                    updateFormData({ street: '', city: '' });
-                    setError(null);
-                }
+        if (address) {
+            updateFormData({
+                street: address.street,
+                city: address.city
+            });
+        } else if (error || (!formData.postalCode || !formData.houseNumber)) {
+            // Clear address if error or inputs are incomplete
+            if (formData.street || formData.city) {
+                updateFormData({ street: '', city: '' });
             }
-        };
-
-        const timeoutId = setTimeout(validateAddress, 500);
-        return () => clearTimeout(timeoutId);
-    }, [formData.postalCode, formData.houseNumber, updateFormData]);
+        }
+    }, [address, error, formData.postalCode, formData.houseNumber, formData.street, formData.city, updateFormData]);
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center mb-8">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <MapPin className="w-6 h-6 text-primary-600" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Waar staat de woning?</h2>
-                <p className="text-gray-500">We controleren of we in jouw gebied actief zijn.</p>
+            <div className="text-center mb-8 mt-12">
+                <h2 className="text-2xl font-medium text-gray-900 mb-2">Waar staat de woning?</h2>
+                <p className="text-gray-500">We controleren of je adres geschikt is voor een warmtepomp.</p>
             </div>
 
             <div className="space-y-4">
-                <Input
-                    label="Postcode"
-                    placeholder="1234 AB"
-                    value={formData.postalCode}
-                    onChange={(e) => updateFormData({ postalCode: e.target.value.toUpperCase() })}
-                    icon={MapPin}
-                    maxLength={7}
-                />
+                <div className="flex gap-4 flex-col md:flex-row">
+                    <Input
+                        label="Postcode"
+                        placeholder="1234 AB"
+                        value={formData.postalCode}
+                        onChange={(e) => {
+                            // Allow only 4 digits followed by 0-2 letters, optionally with a space in between
+                            const value = e.target.value.toUpperCase();
+                            // Remove any non-alphanumeric characters
+                            const clean = value.replace(/[^0-9A-Z]/g, '');
 
-                <div className="grid grid-cols-2 gap-4">
+                            // Logic to format as 1234 AB
+                            let formatted = clean;
+                            if (clean.length > 4) {
+                                formatted = `${clean.slice(0, 4)} ${clean.slice(4, 6)}`;
+                            }
+
+                            // Only update if it matches the pattern of building a postal code
+                            // (digits first, then letters)
+                            if (/^[0-9]{0,4}[A-Z]{0,2}$/.test(clean)) {
+                                updateFormData({ postalCode: formatted });
+                            }
+                        }}
+                        icon={MapPin}
+                        maxLength={7}
+                    />
                     <Input
                         label="Huisnummer"
                         placeholder="10"
                         value={formData.houseNumber}
-                        onChange={(e) => updateFormData({ houseNumber: e.target.value })}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            // Only allow numbers
+                            if (/^\d*$/.test(value)) {
+                                updateFormData({ houseNumber: value });
+                            }
+                        }}
+                        maxLength={5}
                     />
                     <Input
-                        label="Toevoeging (Optioneel)"
+                        label="Toevoeging"
                         placeholder="A"
                         value={formData.houseNumberAddition}
-                        onChange={(e) => updateFormData({ houseNumberAddition: e.target.value })}
+                        onChange={(e) => {
+                            const value = e.target.value.toUpperCase();
+                            // Only allow alphanumeric
+                            if (/^[0-9A-Z]*$/.test(value)) {
+                                updateFormData({ houseNumberAddition: value });
+                            }
+                        }}
+                        maxLength={4}
                     />
                 </div>
 

@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { FormData } from '../../types/form';
-import { CheckCircle, Home, Zap, MapPin, Edit2, Check } from 'lucide-react';
+import { CheckCircle, Home, Zap, MapPin, Edit2, Check, AlertCircle } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Card } from '../ui/Card';
+import { EnergyLabel } from '../ui/EnergyLabel';
+import streetViewPlaceholder from '../../assets/street-view-placeholder.jpg';
 
 interface DataReviewStepProps {
     formData: FormData;
     updateFormData: (data: Partial<FormData>) => void;
+    hasApiData?: boolean | null;
 }
 
-export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, updateFormData }) => {
+export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, updateFormData, hasApiData }) => {
     const [isEditing, setIsEditing] = useState(false);
+
+    // Auto-enable edit mode if no API data found
+    useEffect(() => {
+        if (hasApiData === false) {
+            setIsEditing(true);
+        }
+    }, [hasApiData]);
 
     const houseTypes = [
         { id: 'detached', label: 'Vrijstaand' },
@@ -25,30 +36,23 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center mb-8">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">We hebben je woning gevonden!</h2>
-                <p className="text-gray-500">Controleer of onderstaande gegevens kloppen.</p>
+            <div className="text-center mb-8 mt-12">
+                {hasApiData === false ? (
+                    <>
+                        <h2 className="text-2xl font-medium text-gray-900 mb-2">We konden geen gegevens vinden</h2>
+                        <p className="text-gray-500">Vul de gegevens hieronder handmatig in.</p>
+                    </>
+                ) : (
+                    <>
+                        <h2 className="text-2xl font-medium text-gray-900 mb-2">We hebben je woning gevonden!</h2>
+                        <p className="text-gray-500">Controleer of onderstaande gegevens kloppen.</p>
+                    </>
+                )}
             </div>
 
             <div className="space-y-4">
-                {/* Address Info */}
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <div className="flex items-start gap-3">
-                        <MapPin className="w-5 h-5 text-primary-600 mt-0.5" />
-                        <div>
-                            <p className="font-semibold text-gray-900">
-                                {formData.street} {formData.houseNumber}{formData.houseNumberAddition && formData.houseNumberAddition !== 'None' ? ` ${formData.houseNumberAddition}` : ''}
-                            </p>
-                            <p className="text-sm text-gray-600">{formData.postalCode} {formData.city}</p>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Edit Button */}
-                <div className="flex justify-end">
+                <div className="flex justify-start">
                     <button
                         onClick={() => setIsEditing(!isEditing)}
                         className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors"
@@ -66,6 +70,14 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
                         )}
                     </button>
                 </div>
+                {/* Energy Usage */}
+                {(formData.postalCode || formData.houseNumber || formData.street) && (
+                    <div className="bg-white rounded-xl p-4 border border-gray-100 flex items-center gap-3">
+                        <MapPin className="w- h-4  text-orange-500" />
+                        <p className="text-lg font-bold text-gray-900">{formData.street} {formData.houseNumber}, {formData.postalCode}, {formData.city}</p>
+
+                    </div>
+                )}
 
                 {/* Property Details */}
                 {isEditing ? (
@@ -115,9 +127,26 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
                             onChange={(e) => updateFormData({ energyLabel: e.target.value.toUpperCase() })}
                         />
 
+                        {/* Energy Label */}
+                        <Input
+                            label="Geschat gasverbruik (per jaar)"
+                            type="number"
+                            placeholder="bijv. 150m3"
+                            value={formData.estimatedGasUsage || ''}
+                            onChange={(e) => updateFormData({ estimatedGasUsage: e.target.valueAsNumber })}
+                        />
 
+                        {/* Energy Label */}
+                        <Input
+                            label="Geschat elektriciteitsverbruik (per jaar)"
+                            type="number"
+                            placeholder="bijv. 150kWh"
+                            value={formData.estimatedEnergyUsage || ''}
+                            onChange={(e) => updateFormData({ estimatedEnergyUsage: e.target.valueAsNumber })}
+                        />
                     </div>
                 ) : (
+
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-white rounded-xl p-4 border border-gray-100">
                             <div className="flex items-center gap-2 mb-2">
@@ -150,39 +179,35 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
                                 <Zap className="w-4 h-4 text-primary-600" />
                                 <p className="text-sm font-medium text-gray-600">Energielabel</p>
                             </div>
-                            <p className="text-lg font-bold text-gray-900">{formData.energyLabel || '-'}</p>
+                            <div className="flex items-center">
+                                {formData.energyLabel ? (
+                                    <EnergyLabel label={formData.energyLabel} />
+                                ) : (
+                                    <span className="text-lg font-bold text-gray-900">-</span>
+                                )}
+                            </div>
                         </div>
 
+                        <div className="bg-white rounded-xl p-4 border border-gray-100">
+                            <p className="text-sm font-medium text-gray-600 mb-3">Geschat verbruik per jaar</p>
+                            <div className="grid grid-cols-2 gap-4">
+                                {formData.estimatedEnergyUsage && (
+                                    <div>
+                                        <p className="text-xs text-gray-700">Elektriciteit</p>
+                                        <p className="text-lg font-bold text-gray-900">{formData.estimatedEnergyUsage} kWh</p>
+                                    </div>
+                                )}
+                                {formData.estimatedGasUsage && (
+                                    <div>
+                                        <p className="text-xs text-gray-700">Gas</p>
+                                        <p className="text-lg font-bold text-gray-900">{formData.estimatedGasUsage} m³</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
                     </div>
                 )}
-
-                {/* Energy Usage */}
-                {(formData.estimatedEnergyUsage || formData.estimatedGasUsage) && (
-                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                        <p className="text-sm font-medium text-blue-900 mb-3">Geschat verbruik per jaar</p>
-                        <div className="grid grid-cols-2 gap-4">
-                            {formData.estimatedEnergyUsage && (
-                                <div>
-                                    <p className="text-xs text-blue-700">Elektriciteit</p>
-                                    <p className="text-lg font-bold text-blue-900">{formData.estimatedEnergyUsage} kWh</p>
-                                </div>
-                            )}
-                            {formData.estimatedGasUsage && (
-                                <div>
-                                    <p className="text-xs text-blue-700">Gas</p>
-                                    <p className="text-lg font-bold text-blue-900">{formData.estimatedGasUsage} m³</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-
-                <div className="bg-green-50 rounded-xl p-4 border border-green-100 text-center">
-                    <p className="text-sm text-green-800">
-                        ✓ Deze gegevens zijn automatisch opgehaald en helpen ons een nauwkeurige offerte te maken.
-                    </p>
-                </div>
             </div>
         </div>
     );

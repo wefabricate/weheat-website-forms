@@ -18,11 +18,11 @@ export const HomeDetailsStep: React.FC<HomeDetailsStepProps> = ({ formData, upda
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center mb-8">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center mb-8 mt-12">
+                {/* <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Thermometer className="w-6 h-6 text-primary-600" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Hoe is de isolatie van je woning?</h2>
+                </div> */}
+                <h2 className="text-2xl font-medium text-gray-900 mb-2">Hoe is de isolatie van je woning?</h2>
                 <p className="text-gray-500">Dit helpt ons je potentiële besparing te berekenen.</p>
             </div>
 

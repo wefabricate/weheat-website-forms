@@ -1,22 +1,29 @@
 import React from 'react';
 import { FormData } from '../../types/form';
 import { Input } from '../ui/Input';
-import { User, Mail, Phone, Send } from 'lucide-react';
+import { User, Mail, Phone, Send, PartyPopper } from 'lucide-react';
 
 interface ContactStepProps {
     formData: FormData;
     updateFormData: (data: Partial<FormData>) => void;
+    errors?: Record<string, string>;
+    validateField?: (field: keyof FormData, value: string) => void;
 }
 
-export const ContactStep: React.FC<ContactStepProps> = ({ formData, updateFormData }) => {
+export const ContactStep: React.FC<ContactStepProps> = ({
+    formData,
+    updateFormData,
+    errors = {},
+    validateField
+}) => {
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center mb-8">
+            <div className="text-center mb-8 mt-12">
                 <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Send className="w-6 h-6 text-primary-600" />
+                    <PartyPopper className="w-6 h-6 text-primary-600" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Ontvang je persoonlijke offerte</h2>
-                <p className="text-gray-500">We sturen de berekening naar je e-mail.</p>
+                <h2 className="text-2xl font-medium text-gray-900 mb-2">Je kunt besparen!</h2>
+                <p className="text-gray-500">Laat je gegevens achter en ontvang een persoonlijke besparingsrapport.</p>
             </div>
 
             <div className="space-y-4">
@@ -27,6 +34,7 @@ export const ContactStep: React.FC<ContactStepProps> = ({ formData, updateFormDa
                         value={formData.firstName}
                         onChange={(e) => updateFormData({ firstName: e.target.value })}
                         icon={User}
+                        error={errors.firstName}
                     />
                     <Input
                         label="Achternaam"
@@ -34,6 +42,7 @@ export const ContactStep: React.FC<ContactStepProps> = ({ formData, updateFormDa
                         value={formData.lastName}
                         onChange={(e) => updateFormData({ lastName: e.target.value })}
                         icon={User}
+                        error={errors.lastName}
                     />
                 </div>
 
@@ -43,7 +52,9 @@ export const ContactStep: React.FC<ContactStepProps> = ({ formData, updateFormDa
                     placeholder="jan@voorbeeld.nl"
                     value={formData.email}
                     onChange={(e) => updateFormData({ email: e.target.value })}
+                    onBlur={(e) => validateField?.('email', e.target.value)}
                     icon={Mail}
+                    error={errors.email}
                 />
 
                 <Input
@@ -52,7 +63,9 @@ export const ContactStep: React.FC<ContactStepProps> = ({ formData, updateFormDa
                     placeholder="06 12345678"
                     value={formData.phone}
                     onChange={(e) => updateFormData({ phone: e.target.value })}
+                    onBlur={(e) => validateField?.('phone', e.target.value)}
                     icon={Phone}
+                    error={errors.phone}
                 />
             </div>
         </div>

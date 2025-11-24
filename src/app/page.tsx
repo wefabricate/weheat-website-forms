@@ -1,11 +1,14 @@
 "use client";
 
+import { Suspense } from 'react';
 import { MultiStepForm } from '../components/MultiStepForm';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <MultiStepForm />
+    <main className="min-h-screen bg-offwhite-50">
+      <Suspense fallback={<div>Laden...</div>}>
+        <MultiStepForm />
+      </Suspense>
     </main>
   );
 }
