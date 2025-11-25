@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormData } from '../../types/form';
 import { Card } from '../ui/Card';
-import { Home, AppWindow, Layers, BrickWall, ArrowDownToLine } from 'lucide-react';
+import { Home, Grid2X2, Layers, BrickWall, ArrowDownToLine, BetweenVerticalStart } from 'lucide-react';
 
 interface InsulationStepProps {
     formData: FormData;
@@ -11,8 +11,8 @@ interface InsulationStepProps {
 export const InsulationStep: React.FC<InsulationStepProps> = ({ formData, updateFormData }) => {
     const insulationOptions = [
         { id: 'Het dak is geïsoleerd', label: 'Het dak is geïsoleerd', description: 'Warmte stijgt op, dakisolatie houdt het tegen', icon: Home },
-        { id: 'Met dubbelglas of beter', label: 'Met dubbelglas of beter', description: 'Houdt de kou buiten en warmte binnen', icon: AppWindow },
-        { id: 'Met spouwmuurisolatie', label: 'Met spouwmuurisolatie', description: 'Isolatie tussen de binnen- en buitenmuur', icon: Layers },
+        { id: 'Met dubbelglas of beter', label: 'Met dubbelglas of beter', description: 'Houdt de kou buiten en warmte binnen', icon: Grid2X2 },
+        { id: 'Met spouwmuurisolatie', label: 'Met spouwmuurisolatie', description: 'Isolatie tussen de binnen- en buitenmuur', icon: BetweenVerticalStart },
         { id: 'Met andere muurisolatie', label: 'Met andere muurisolatie', description: 'Bijvoorbeeld voorzetwanden of buitengevelisolatie', icon: BrickWall },
         { id: 'Met vloerisolatie', label: 'Met vloerisolatie', description: 'Voorkomt optrekkende kou vanuit de grond', icon: ArrowDownToLine },
     ];
