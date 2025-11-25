@@ -62,7 +62,7 @@ export const ContactStep: React.FC<ContactStepProps> = ({
         });
     }, []);
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-6">
             <div className="text-center mb-8 mt-12">
                 <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <PartyPopper className="w-6 h-6 text-primary-600" />

@@ -36,7 +36,7 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-6">
             <div className="text-center mb-8 mt-12">
                 {hasApiData === false ? (
                     <>
@@ -104,20 +104,19 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
                         {/* Build Year Selection */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Bouwjaar</label>
-                            <div className="grid grid-cols-1 gap-2">
+                            <select
+                                value={formData.buildYear}
+                                onChange={(e) => updateFormData({ buildYear: e.target.value as any })}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all appearance-none bg-white"
+                                style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '0.65em auto' }}
+                            >
+                                <option value="">Selecteer bouwjaar</option>
                                 {['Voor 1970', 'Tussen 1971 en 1989', 'Tussen 1990 en 1999', 'Tussen 2000 en 2019', 'Na 2019'].map((range) => (
-                                    <button
-                                        key={range}
-                                        onClick={() => updateFormData({ buildYear: range as any })}
-                                        className={`w-full px-4 py-3 rounded-xl border text-left transition-all ${formData.buildYear === range
-                                                ? 'border-primary-500 bg-primary-50 text-primary-700 ring-1 ring-primary-500'
-                                                : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50 text-gray-700'
-                                            }`}
-                                    >
+                                    <option key={range} value={range}>
                                         {range}
-                                    </button>
+                                    </option>
                                 ))}
-                            </div>
+                            </select>
                         </div>
 
                         {/* Area */}
@@ -130,14 +129,22 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
                         />
 
                         {/* Energy Label */}
-                        <Input
-                            label="Energielabel"
-                            type="text"
-                            placeholder="bijv. C"
-                            maxLength={2}
-                            value={formData.energyLabel || ''}
-                            onChange={(e) => updateFormData({ energyLabel: e.target.value.toUpperCase() })}
-                        />
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Energielabel</label>
+                            <select
+                                value={formData.energyLabel || ''}
+                                onChange={(e) => updateFormData({ energyLabel: e.target.value })}
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all appearance-none bg-white"
+                                style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '0.65em auto' }}
+                            >
+                                <option value="">Selecteer energielabel</option>
+                                {['A++++', 'A+++', 'A++', 'A+', 'A', 'B', 'C', 'D', 'E', 'F', 'G'].map((label) => (
+                                    <option key={label} value={label}>
+                                        {label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
                         {/* Energy Label */}
                         <Input

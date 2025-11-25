@@ -30,7 +30,7 @@ export const HeatingSystemStep: React.FC<HeatingSystemStepProps> = ({ formData, 
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-8">
             <div className="text-center mb-8 mt-12">
                 <h2 className="text-2xl font-medium text-gray-900 mb-2">Wat voor verwarming heeft je huis?
                 </h2>
@@ -48,8 +48,8 @@ export const HeatingSystemStep: React.FC<HeatingSystemStepProps> = ({ formData, 
                                 onClick={() => toggleDistribution(type.id as any)}
                                 className="flex items-center gap-4 p-4"
                             >
-                                <div className={`p-2 rounded-lg ${formData.heatDistribution?.includes(type.id as any) ? 'bg-primary-100' : 'bg-gray-100'}`}>
-                                    <type.icon className={`w-6 h-6 ${formData.heatDistribution?.includes(type.id as any) ? 'text-primary-600' : 'text-gray-500'}`} />
+                                <div className={`p-2 rounded-lg ${formData.heatDistribution?.includes(type.id as any) ? 'bg-primary-100' : 'bg-primary-100'}`}>
+                                    <type.icon className={`w-6 h-6 ${formData.heatDistribution?.includes(type.id as any) ? 'text-primary-600' : 'text-primary-500'}`} />
                                 </div>
                                 <div className="text-left">
                                     <div className="font-medium">{type.label}</div>

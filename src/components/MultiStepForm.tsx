@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { CheckCircle } from 'lucide-react';
 
 import { FormData, initialFormData } from '../types/form';
 import { useAddressData } from '../hooks/useAddressData';
@@ -21,7 +20,7 @@ import step2Image from '../assets/blackbird-1.jpg';
 import step3Image from '../assets/sparrow-1.jpg';
 import step4Image from '../assets/sparrow-2.jpeg';
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 const stepImages: Record<number, any> = {
     1: step1Image,
@@ -29,6 +28,7 @@ const stepImages: Record<number, any> = {
     3: step2Image, // Reuse step 2 image for insulation
     4: step3Image,
     5: step4Image,
+    6: step4Image, // Reuse step 4 image for completion
 };
 
 export const MultiStepForm = () => {
@@ -37,7 +37,7 @@ export const MultiStepForm = () => {
     const [formData, setFormData] = useState<FormData>(initialFormData);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isSuccess, setIsSuccess] = useState(false);
+
 
     // Hooks
     const searchParams = useSearchParams();
@@ -148,28 +148,12 @@ export const MultiStepForm = () => {
     const handleSubmit = async () => {
         setIsSubmitting(true);
         await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsSubmitting(false);
-        setIsSuccess(true);
         console.log('Form submitted:', formData);
+        setIsSubmitting(false);
+        setCurrentStep(6);
     };
 
-    // Success screen
-    if (isSuccess) {
-        return (
-            <div className="max-w-2xl mx-auto pt-24 text-center animate-in fade-in zoom-in duration-500">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle className="w-10 h-10 text-green-600" />
-                </div>
-                <h2 className="text-3xl font-medium text-gray-900 mb-4">Verzonden!</h2>
-                <p className="text-md text-gray-600 mb-8">
-                    We hebben je gegevens ontvangen. Een van onze experts neemt binnenkort contact met je op met een persoonlijke offerte.
-                </p>
-                <Button onClick={() => window.location.reload()}>
-                    Plan een adviesgesprek
-                </Button>
-            </div>
-        );
-    }
+
 
     return (
         <div className="min-h-screen flex flex-col md:flex-row">
@@ -222,7 +206,7 @@ export const MultiStepForm = () => {
             {/* Desktop Right Column: Image */}
             <div className="p-12 hidden md:block w-1/2 h-screen flex">
                 <div className="w-full rounded-3xl h-full sticky top-0 overflow-hidden relative">
-                    {[1, 2, 3, 4, 5].map((step) => (
+                    {[1, 2, 3, 4, 5, 6].map((step) => (
                         <div
                             key={step}
                             className={`absolute inset-0 transition-opacity duration-400 ease-in-out ${currentStep === step ? 'opacity-100 z-10' : 'opacity-0 z-0'

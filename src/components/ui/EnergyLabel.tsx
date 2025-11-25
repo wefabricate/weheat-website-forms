@@ -31,7 +31,7 @@ export const EnergyLabel: React.FC<EnergyLabelProps> = ({ label, className = '' 
     const colorClass = getLabelColor(label);
 
     return (
-        <div className={`inline-flex items-center justify-center w-12 h-8 font-bold rounded-sm shadow-sm ${colorClass} ${className}`} style={{ clipPath: 'polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%)', paddingRight: '8px' }}>
+        <div className={`inline-flex items-center justify-center w-16 h-8 font-bold rounded-sm shadow-sm ${colorClass} ${className}`} style={{ clipPath: 'polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%)', paddingRight: '8px' }}>
             {label}
         </div>
     );

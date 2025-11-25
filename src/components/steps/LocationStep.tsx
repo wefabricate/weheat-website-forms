@@ -27,7 +27,7 @@ export const LocationStep: React.FC<LocationStepProps> = ({ formData, updateForm
     }, [address, error, formData.postalCode, formData.houseNumber, formData.street, formData.city, updateFormData]);
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-6">
             <div className="text-center mb-8 mt-12">
                 <h2 className="text-2xl font-medium text-gray-900 mb-2">Bereken nu je besparingen!</h2>
                 <p className="text-gray-500">Vul je adres in en we controleren of je woning geschikt is voor een warmtepomp.</p>

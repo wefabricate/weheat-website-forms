@@ -5,6 +5,7 @@ import { DataReviewStep } from './steps/DataReviewStep';
 import { HeatingSystemStep } from './steps/HeatingSystemStep';
 import { ContactStep } from './steps/ContactStep';
 import { InsulationStep } from './steps/InsulationStep';
+import { CompletionStep } from './steps/CompletionStep';
 
 interface StepRendererProps {
     currentStep: number;
@@ -48,6 +49,9 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
                     errors={errors}
                     validateField={validateField}
                 />
+            )}
+            {currentStep === 6 && (
+                <CompletionStep />
             )}
         </div>
     );

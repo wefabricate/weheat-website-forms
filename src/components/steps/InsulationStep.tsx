@@ -29,7 +29,7 @@ export const InsulationStep: React.FC<InsulationStepProps> = ({ formData, update
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-8">
             <div className="text-center mb-8 mt-12">
                 <h2 className="text-2xl font-medium text-gray-900 mb-2">Hoe is je huis geïsoleerd?</h2>
                 <p className="text-gray-500">Meerdere antwoorden mogelijk</p>
@@ -46,8 +46,8 @@ export const InsulationStep: React.FC<InsulationStepProps> = ({ formData, update
                                 onClick={() => toggleOption(option.id)}
                                 className="flex items-center gap-4 p-4"
                             >
-                                <div className={`p-2 rounded-lg ${formData.insulation?.includes(option.id) ? 'bg-primary-100' : 'bg-gray-100'}`}>
-                                    <option.icon className={`w-6 h-6 ${formData.insulation?.includes(option.id) ? 'text-primary-600' : 'text-gray-500'}`} />
+                                <div className={`p-2 rounded-lg ${formData.insulation?.includes(option.id) ? 'bg-primary-100' : 'bg-primary-100'}`}>
+                                    <option.icon className={`w-6 h-6 ${formData.insulation?.includes(option.id) ? 'text-primary-600' : 'text-primary-500'}`} />
                                 </div>
                                 <div className="text-left">
                                     <div className="font-medium">{option.label}</div>
