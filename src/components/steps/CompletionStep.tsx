@@ -4,7 +4,7 @@ import { Button } from '../ui/Button';
 
 export const CompletionStep: React.FC = () => {
     const [countdown, setCountdown] = useState(5);
-    const REDIRECT_URL = 'https://www.weheat.nl';
+    const REDIRECT_URL = 'https://weheat-dev.webflow.io/besparingscheck-test';
 
     useEffect(() => {
         // Countdown timer

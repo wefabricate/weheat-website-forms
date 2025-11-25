@@ -21,7 +21,7 @@ export interface FormData {
     insulation: string[];
 
     // Step 3: Heating System
-    heatDistribution: ('radiators' | 'floor-heating' | 'air-heating' | 'combination')[];
+    heatDistribution: ('stadsverwarming' | 'luchtverwarming' | 'radiatoren' | 'convectoren-vloer' | 'convectoren-muren' | 'vloerverwarming' | 'anders')[];
 
     // Step 4: Contact
     firstName: string;
