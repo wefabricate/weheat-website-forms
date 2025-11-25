@@ -29,8 +29,8 @@ export const LocationStep: React.FC<LocationStepProps> = ({ formData, updateForm
     return (
         <div className="space-y-6">
             <div className="text-center mb-8 mt-12">
-                <h2 className="text-2xl font-medium text-gray-900 mb-2">Bereken nu je besparingen!</h2>
-                <p className="text-gray-500">Vul je adres in en we controleren of je woning geschikt is voor een warmtepomp.</p>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-900 mb-2">Bereken nu je besparingen!</h2>
+                <p className="text-gray-500 md:text-lg">Vul je adres in en we controleren of je woning geschikt is voor een warmtepomp.</p>
             </div>
 
             <div className="space-y-4">
@@ -97,7 +97,7 @@ export const LocationStep: React.FC<LocationStepProps> = ({ formData, updateForm
                     {!error && formData.street && formData.city && (
                         <div className="flex items-center justify-center gap-2 text-green-700 animate-in fade-in slide-in-from-top-1">
                             <Check className="w-5 h-5 text-green-600" />
-                            <p className="text-sm font-medium">
+                            <p className="text-sm md:text-base font-medium">
                                 {formData.street} {formData.houseNumber}{formData.houseNumberAddition ? ` ${formData.houseNumberAddition}` : ''}, {formData.city}
                             </p>
                         </div>

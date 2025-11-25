@@ -67,8 +67,8 @@ export const ContactStep: React.FC<ContactStepProps> = ({
                 <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <PartyPopper className="w-6 h-6 text-primary-600" />
                 </div>
-                <h2 className="text-2xl font-medium text-gray-900 mb-2">Je kunt besparen!</h2>
-                <p className="text-gray-500">Laat je gegevens achter en ontvang een persoonlijke besparingsrapport.</p>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-900 mb-2">Je kunt besparen!</h2>
+                <p className="text-gray-500 md:text-lg">Laat je gegevens achter en ontvang een persoonlijke besparingsrapport.</p>
             </div>
 
             <div className="space-y-4">

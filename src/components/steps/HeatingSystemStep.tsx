@@ -32,9 +32,9 @@ export const HeatingSystemStep: React.FC<HeatingSystemStepProps> = ({ formData, 
     return (
         <div className="space-y-8">
             <div className="text-center mb-8 mt-12">
-                <h2 className="text-2xl font-medium text-gray-900 mb-2">Wat voor verwarming heeft je huis?
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-900 mb-2">Wat voor verwarming heeft je huis?
                 </h2>
-                <p className="text-gray-500">Meerdere opties mogelijk</p>
+                <p className="text-gray-500 md:text-lg">Meerdere opties mogelijk</p>
             </div>
 
             <div className="space-y-6">
