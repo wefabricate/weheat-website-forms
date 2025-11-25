@@ -13,7 +13,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ message = 'Gegev
                 <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mb-6 animate-pulse">
                     <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{message}</h3>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-900 mb-2">{message}</h2>
                 <p className="text-gray-500 max-w-xs text-center mx-auto">
                     We zoeken de gegevens van je woning op. Dit kan enkele seconden duren.
                 </p>
@@ -27,7 +27,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ message = 'Gegev
                 <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                     <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{message}</h3>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-900 mb-2">{message}</h2>
                 <p className="text-gray-500 max-w-xs mx-auto">
                     We zoeken de gegevens van je woning op. Dit kan enkele seconden duren.
                 </p>
