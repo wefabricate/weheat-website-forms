@@ -90,7 +90,16 @@ export const MultiStepForm = () => {
             case 3:
                 return !!(formData.insulation && formData.insulation.length > 0);
             case 4:
-                return !!(formData.heatDistribution && formData.heatDistribution.length > 0);
+                // Check if heat distribution is selected
+                if (!formData.heatDistribution || formData.heatDistribution.length === 0) {
+                    return false;
+                }
+                // Check if only incompatible systems are selected
+                const incompatibleSystems = ['stadsverwarming', 'luchtverwarming'];
+                const hasOnlyIncompatible = formData.heatDistribution.every(
+                    system => incompatibleSystems.includes(system as string)
+                );
+                return !hasOnlyIncompatible;
             case 5:
                 const isEmailValid = validateEmail(formData.email);
                 const isPhoneValid = validatePhone(formData.phone);
