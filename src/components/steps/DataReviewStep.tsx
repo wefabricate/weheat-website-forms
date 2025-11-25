@@ -40,12 +40,12 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
             <div className="text-center mb-8 mt-12">
                 {hasApiData === false ? (
                     <>
-                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-900 mb-2">We konden geen gegevens vinden</h2>
+                        <h2 className="text-2xl md:text-2xl lg:text-3xl font-medium text-gray-900 mb-2">We konden geen gegevens vinden</h2>
                         <p className="text-gray-500 md:text-lg">Vul de gegevens hieronder handmatig in.</p>
                     </>
                 ) : (
                     <>
-                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-900 mb-2">We hebben je woning gevonden!</h2>
+                        <h2 className="text-2xl md:text-2xl lg:text-3xl font-medium text-gray-900 mb-2">We hebben je woning gevonden!</h2>
                         <p className="text-gray-500 md:text-lg">Controleer of onderstaande gegevens kloppen.</p>
                     </>
                 )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormData } from '../../types/form';
 import { Card } from '../ui/Card';
-import { Building2, Gauge, Waves, Wind } from 'lucide-react';
+import { Building2, Gauge, Waves, Wind, Home, Flame, MoreHorizontal } from 'lucide-react';
 
 interface HeatingSystemStepProps {
     formData: FormData;
@@ -9,30 +9,34 @@ interface HeatingSystemStepProps {
 }
 
 export const HeatingSystemStep: React.FC<HeatingSystemStepProps> = ({ formData, updateFormData }) => {
-    const distributionTypes = [
-        { id: 'radiators', label: 'Radiatoren', description: 'Traditionele verwarmingsradiatoren', icon: Gauge },
-        { id: 'floor-heating', label: 'Vloerverwarming', description: 'Warmte via de vloer', icon: Waves },
-        { id: 'air-heating', label: 'Luchtverwarming', description: 'Warmte via ventilatiesysteem', icon: Wind },
-        { id: 'combination', label: 'Combinatie', description: 'Meerdere systemen gecombineerd', icon: Building2 },
+    const heatingTypes = [
+        { id: 'stadsverwarming', label: 'Stadsverwarming', description: 'Centrale warmtevoorziening via het stadsnet', icon: Building2 },
+        { id: 'luchtverwarming', label: 'Luchtverwarming', description: 'Warmte via ventilatiesysteem', icon: Wind },
+        { id: 'radiatoren', label: 'Radiatoren', description: 'Traditionele verwarmingsradiatoren', icon: Gauge },
+        { id: 'convectoren-vloer', label: 'Convectoren in de vloer', description: 'Convectoren geïntegreerd in de vloer', icon: Waves },
+        { id: 'convectoren-muren', label: 'Convectoren in de muren', description: 'Convectoren geïntegreerd in de muren', icon: Home },
+        { id: 'vloerverwarming', label: 'Vloerverwarming', description: 'Warmte via de vloer', icon: Flame },
+        { id: 'anders', label: 'Anders', description: 'Ander type verwarming', icon: MoreHorizontal },
     ];
 
-    const toggleDistribution = (id: 'radiators' | 'floor-heating' | 'air-heating' | 'combination') => {
+
+    const toggleHeatingType = (id: string) => {
         const current = formData.heatDistribution || [];
-        const isSelected = current.includes(id);
+        const isSelected = current.includes(id as any);
 
         if (isSelected) {
             // Remove from array
-            updateFormData({ heatDistribution: current.filter(item => item !== id) });
+            updateFormData({ heatDistribution: current.filter(item => item !== id) as any });
         } else {
             // Add to array
-            updateFormData({ heatDistribution: [...current, id] });
+            updateFormData({ heatDistribution: [...current, id] as any });
         }
     };
 
     return (
         <div className="space-y-8">
             <div className="text-center mb-8 mt-12">
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-900 mb-2">Wat voor verwarming heeft je huis?
+                <h2 className="text-2xl md:text-2xl lg:text-3xl font-medium text-gray-900 mb-2">Wat voor verwarming heeft je huis?
                 </h2>
                 <p className="text-gray-500 md:text-lg">Meerdere opties mogelijk</p>
             </div>
@@ -41,11 +45,11 @@ export const HeatingSystemStep: React.FC<HeatingSystemStepProps> = ({ formData, 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">Meerdere opties mogelijk</label>
                     <div className="space-y-2">
-                        {distributionTypes.map((type) => (
+                        {heatingTypes.map((type) => (
                             <Card
                                 key={type.id}
                                 selected={formData.heatDistribution?.includes(type.id as any) || false}
-                                onClick={() => toggleDistribution(type.id as any)}
+                                onClick={() => toggleHeatingType(type.id)}
                                 className="flex items-center gap-4 p-4"
                             >
                                 <div className={`p-2 rounded-lg ${formData.heatDistribution?.includes(type.id as any) ? 'bg-primary-100' : 'bg-primary-100'}`}>

@@ -29,7 +29,7 @@ export const CompletionStep: React.FC = () => {
                 <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Check className="w-10 h-10 text-primary-600" />
                 </div>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-gray-900 mb-4">Bedankt voor je aanvraag!</h2>
+                <h2 className="text-2xl md:text-2xl lg:text-3xl font-medium text-gray-900 mb-4">Bedankt voor je aanvraag!</h2>
                 <p className="text-lg md:text-xl text-gray-600 mb-4">
                     We hebben je gegevens ontvangen. Een van onze experts neemt binnenkort contact met je op met een persoonlijke offerte.
                 </p>

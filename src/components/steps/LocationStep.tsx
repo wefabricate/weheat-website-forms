@@ -29,7 +29,7 @@ export const LocationStep: React.FC<LocationStepProps> = ({ formData, updateForm
     return (
         <div className="space-y-6">
             <div className="text-center mb-8 mt-12">
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-gray-900 mb-2">Bereken nu je besparingen!</h2>
+                <h2 className="text-2xl md:text-2xl lg:text-3xl font-medium text-gray-900 mb-2">Bereken nu je besparingen!</h2>
                 <p className="text-gray-500 md:text-lg">Vul je adres in en we controleren of je woning geschikt is voor een warmtepomp.</p>
             </div>
 
