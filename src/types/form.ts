@@ -16,9 +16,9 @@ export interface FormData {
     woz?: string;
 
     // Step 2: Home Details
-    houseType: 'detached' | 'semi-detached' | 'terraced' | 'apartment' | '';
-    buildYear: string;
-    insulation: 'poor' | 'average' | 'good' | 'excellent' | '';
+    houseType: 'Vrijstaande woning' | 'Twee-onder-een-kap' | 'Rijwoning' | 'Hoekwoning' | 'Appartement' | '';
+    buildYear: 'Voor 1970' | 'Tussen 1971 en 1989' | 'Tussen 1990 en 1999' | 'Tussen 2000 en 2019' | 'Na 2019' | '';
+    insulation: string[];
 
     // Step 3: Heating System
     heatDistribution: ('radiators' | 'floor-heating' | 'air-heating' | 'combination')[];
@@ -36,7 +36,7 @@ export const initialFormData: FormData = {
     houseNumberAddition: '',
     houseType: '',
     buildYear: '',
-    insulation: '',
+    insulation: [],
     heatDistribution: [],
     firstName: '',
     lastName: '',

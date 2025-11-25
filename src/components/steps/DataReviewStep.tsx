@@ -24,20 +24,11 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
     }, [hasApiData]);
 
     const houseTypes = [
-        { id: 'vrijstaande_woning', label: 'Vrijstaande woning' },
-        { id: '2_onder_1_kap_woning', label: '2 onder 1 kap woning' },
-        { id: 'geschakelde_2_onder_1_kapwoning', label: 'Geschakelde 2 onder 1 kapwoning' },
-        { id: 'geschakelde_woning', label: 'Geschakelde woning' },
-        { id: 'tussen_rijwoning', label: 'Tussen/rijwoning' },
-        { id: 'hoekwoning', label: 'Hoekwoning' },
-        { id: 'eindwoning', label: 'Eindwoning' },
-        { id: 'galerijflat', label: 'Galerijflat' },
-        { id: 'portiekflat', label: 'Portiekflat' },
-        { id: 'corridorflat', label: 'Corridorflat' },
-        { id: 'maisonnette', label: 'Maisonnette' },
-        { id: 'benedenwoning', label: 'Benedenwoning' },
-        { id: 'bovenwoning', label: 'Bovenwoning' },
-        { id: 'portiekwoning', label: 'Portiekwoning' },
+        { id: 'Vrijstaande woning', label: 'Vrijstaande woning' },
+        { id: 'Twee-onder-een-kap', label: 'Twee-onder-een-kap' },
+        { id: 'Rijwoning', label: 'Rijwoning' },
+        { id: 'Hoekwoning', label: 'Hoekwoning' },
+        { id: 'Appartement', label: 'Appartement' },
     ];
 
     const getHouseTypeLabel = (type: string) => {
@@ -110,14 +101,24 @@ export const DataReviewStep: React.FC<DataReviewStepProps> = ({ formData, update
                             </select>
                         </div>
 
-                        {/* Build Year */}
-                        <Input
-                            label="Bouwjaar"
-                            type="number"
-                            placeholder="bijv. 1990"
-                            value={formData.buildYear}
-                            onChange={(e) => updateFormData({ buildYear: e.target.value })}
-                        />
+                        {/* Build Year Selection */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Bouwjaar</label>
+                            <div className="grid grid-cols-1 gap-2">
+                                {['Voor 1970', 'Tussen 1971 en 1989', 'Tussen 1990 en 1999', 'Tussen 2000 en 2019', 'Na 2019'].map((range) => (
+                                    <button
+                                        key={range}
+                                        onClick={() => updateFormData({ buildYear: range as any })}
+                                        className={`w-full px-4 py-3 rounded-xl border text-left transition-all ${formData.buildYear === range
+                                                ? 'border-primary-500 bg-primary-50 text-primary-700 ring-1 ring-primary-500'
+                                                : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50 text-gray-700'
+                                            }`}
+                                    >
+                                        {range}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
 
                         {/* Area */}
                         <Input

@@ -21,13 +21,14 @@ import step2Image from '../assets/blackbird-1.jpg';
 import step3Image from '../assets/sparrow-1.jpg';
 import step4Image from '../assets/sparrow-2.jpeg';
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 const stepImages: Record<number, any> = {
     1: step1Image,
     2: step2Image,
-    3: step3Image,
-    4: step4Image,
+    3: step2Image, // Reuse step 2 image for insulation
+    4: step3Image,
+    5: step4Image,
 };
 
 export const MultiStepForm = () => {
@@ -87,8 +88,10 @@ export const MultiStepForm = () => {
                     formData.estimatedEnergyUsage
                 );
             case 3:
-                return !!(formData.heatDistribution && formData.heatDistribution.length > 0);
+                return !!(formData.insulation && formData.insulation.length > 0);
             case 4:
+                return !!(formData.heatDistribution && formData.heatDistribution.length > 0);
+            case 5:
                 const isEmailValid = validateEmail(formData.email);
                 const isPhoneValid = validatePhone(formData.phone);
                 const hasName = !!(formData.firstName && formData.lastName);
@@ -219,7 +222,7 @@ export const MultiStepForm = () => {
             {/* Desktop Right Column: Image */}
             <div className="p-12 hidden md:block w-1/2 h-screen flex">
                 <div className="w-full rounded-3xl h-full sticky top-0 overflow-hidden relative">
-                    {[1, 2, 3, 4].map((step) => (
+                    {[1, 2, 3, 4, 5].map((step) => (
                         <div
                             key={step}
                             className={`absolute inset-0 transition-opacity duration-400 ease-in-out ${currentStep === step ? 'opacity-100 z-10' : 'opacity-0 z-0'

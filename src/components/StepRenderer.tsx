@@ -4,6 +4,7 @@ import { LocationStep } from './steps/LocationStep';
 import { DataReviewStep } from './steps/DataReviewStep';
 import { HeatingSystemStep } from './steps/HeatingSystemStep';
 import { ContactStep } from './steps/ContactStep';
+import { InsulationStep } from './steps/InsulationStep';
 
 interface StepRendererProps {
     currentStep: number;
@@ -35,9 +36,12 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
                 />
             )}
             {currentStep === 3 && (
-                <HeatingSystemStep formData={formData} updateFormData={updateFormData} />
+                <InsulationStep formData={formData} updateFormData={updateFormData} />
             )}
             {currentStep === 4 && (
+                <HeatingSystemStep formData={formData} updateFormData={updateFormData} />
+            )}
+            {currentStep === 5 && (
                 <ContactStep
                     formData={formData}
                     updateFormData={updateFormData}

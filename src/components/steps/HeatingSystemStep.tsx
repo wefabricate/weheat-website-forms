@@ -32,14 +32,14 @@ export const HeatingSystemStep: React.FC<HeatingSystemStepProps> = ({ formData, 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center mb-8 mt-12">
-                <h2 className="text-2xl font-medium text-gray-900 mb-2">Wat is je belangrijkste verwarmingsbron?
+                <h2 className="text-2xl font-medium text-gray-900 mb-2">Wat voor verwarming heeft je huis?
                 </h2>
-                <p className="text-gray-500">meerdere opties mogelijk</p>
+                <p className="text-gray-500">Meerdere opties mogelijk</p>
             </div>
 
             <div className="space-y-6">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Distributiesysteem</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">Meerdere opties mogelijk</label>
                     <div className="space-y-2">
                         {distributionTypes.map((type) => (
                             <Card
