@@ -1,16 +1,16 @@
 import React from 'react';
-import { Check, ExternalLink } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 export const CompletionStep: React.FC = () => {
-    const REDIRECT_URL = 'https://weheat-dev.webflow.io/besparingscheck-test';
+    const REDIRECT_URL = 'https://weheat.nl/besparingscheck-test';
 
     const handleRedirectToAdviesgesprek = () => {
         window.location.href = REDIRECT_URL;
     };
 
     const handleRedirectToWebsite = () => {
-        window.location.href = 'https://weheat.nl';
+        window.location.href = REDIRECT_URL;
     };
 
     return (
