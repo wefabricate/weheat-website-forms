@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { InstallerIntakeForm } from '../../../components/InstallerIntakeForm';
+import { InstallerIntakeForm } from '../../components/InstallerIntakeForm';
 
 export default function ScheduleIntakePage() {
   return (

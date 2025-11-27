@@ -143,6 +143,13 @@ export const MultiStepForm = () => {
         if (currentStep === 1) {
             await fetchAddressData(formData.postalCode, formData.houseNumber, formData.houseNumberAddition, updateFormData);
         }
+
+        // If we're on the Contact step (Step 5), submit the form
+        if (currentStep === 5) {
+            await handleSubmit();
+            return;
+        }
+
         if (currentStep < TOTAL_STEPS) {
             setCurrentStep(prev => prev + 1);
         }
@@ -161,10 +168,76 @@ export const MultiStepForm = () => {
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        console.log('Form submitted:', formData);
-        setIsSubmitting(false);
-        setCurrentStep(6);
+
+        try {
+            const payload = {
+                triggerType: "form_submission",
+                payload: {
+                    name: "Savings Tool",
+                    siteId: "67ed5695314f69c537693240", // Hardcoded from example
+                    data: {
+                        "Empty 6": "",
+                        "Postcode": formData.postalCode,
+                        "Huisnummer": formData.houseNumber,
+                        "Toevoeging": formData.houseNumberAddition,
+                        "Oppervlakte-Known": formData.area || "",
+                        "Energielabel-known": formData.energyLabel || "",
+                        "Type huis": formData.houseType,
+                        "Oppervlakte 7": formData.area || "",
+                        "Mensen": "2", // Default as per example
+                        "Bouwjaar": formData.buildYear,
+                        "Het dak is geïsoleerd": formData.insulation.includes('Het dak is geïsoleerd') ? "true" : "false",
+                        "Met dubbelglas of beter": formData.insulation.includes('Met dubbelglas of beter') ? "true" : "false",
+                        "Met spouwmuurisolatie": formData.insulation.includes('Met spouwmuurisolatie') ? "true" : "false",
+                        "Met andere muurisolatie": formData.insulation.includes('Met andere muurisolatie') ? "true" : "false",
+                        "Met vloerisolatie": formData.insulation.includes('Met vloerisolatie') ? "true" : "false",
+                        "Stadsverwarming": formData.heatDistribution.includes('stadsverwarming') ? "true" : "false",
+                        "Luchtverwarming": formData.heatDistribution.includes('luchtverwarming') ? "true" : "false",
+                        "Radiatoren": formData.heatDistribution.includes('radiatoren') ? "true" : "false",
+                        "Convectoren in de vloer": formData.heatDistribution.includes('convectoren-vloer') ? "true" : "false",
+                        "Convectoren in de muren": formData.heatDistribution.includes('convectoren-muren') ? "true" : "false",
+                        "Vloerverwarming": formData.heatDistribution.includes('vloerverwarming') ? "true" : "false",
+                        "Anders": formData.heatDistribution.includes('anders') ? "true" : "false",
+                        "Radiatoren 2": "false", // Default as per example
+                        "Oppervlakte": formData.estimatedGasUsage ? formData.estimatedGasUsage.toString() : "",
+                        "Savings Data": "Sparrow P60", // Default as per example
+                        "Savings Data 3": "",
+                        "Voornaam": formData.firstName,
+                        "Achternaam": formData.lastName,
+                        "Email": formData.email,
+                        "company": ""
+                    },
+                    submittedAt: new Date().toISOString(),
+                    id: Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join(''), // Generate random 24 hex char ID
+                    formId: "68d663c57d54d4d7ec462bb2", // Hardcoded from example
+                    formElementId: "244093c9-f80f-d2e6-6e9c-9092e3f7e468", // Hardcoded from example
+                    pageId: "67f5271fb6e1052f98b09695", // Hardcoded from example
+                    publishedPath: "/producten/flint",
+                    pageUrl: "https://www.weheat.nl/producten/flint",
+                    schema: []
+                }
+            };
+
+            const response = await fetch('https://defaultafcb403265a34bf5894edb5aeefe64.71.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/7ee5ab6664da4e5bb38e92ce40b8af3c/triggers/manual/paths/invoke?api-version=1&sp=/triggers/manual/run&sv=1.0&sig=wwn7F98vaJWYb9KMOVd_RCfteOTsDjGEidGJCZjfoD8', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`API call failed: ${response.statusText}`);
+            }
+
+            console.log('Form submitted successfully to Power Automate');
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            // Optionally handle error state here, but for now we proceed to next step
+        } finally {
+            setIsSubmitting(false);
+            setCurrentStep(6);
+        }
     };
 
 
@@ -228,7 +301,7 @@ export const MultiStepForm = () => {
 
 
                 {/* Desktop Footer */}
-                {!isFetchingData && (
+                {!isFetchingData && currentStep < TOTAL_STEPS && (
                     <FormNavigation
                         currentStep={currentStep}
                         totalSteps={TOTAL_STEPS}
@@ -236,7 +309,6 @@ export const MultiStepForm = () => {
                         isSubmitting={isSubmitting}
                         onNext={handleNext}
                         onBack={handleBack}
-                        onSubmit={handleSubmit}
                         hasOnlyIncompatible={hasOnlyIncompatible}
                     />
                 )}
@@ -301,7 +373,7 @@ export const MultiStepForm = () => {
                     </div>
                 </div>
             )}
-            {!isFetchingData && (
+            {!isFetchingData && currentStep < TOTAL_STEPS && (
                 <FormNavigation
                     currentStep={currentStep}
                     totalSteps={TOTAL_STEPS}
@@ -309,7 +381,6 @@ export const MultiStepForm = () => {
                     isSubmitting={isSubmitting}
                     onNext={handleNext}
                     onBack={handleBack}
-                    onSubmit={handleSubmit}
                     isMobile
                     hasOnlyIncompatible={hasOnlyIncompatible}
                 />

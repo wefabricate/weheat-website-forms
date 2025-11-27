@@ -111,6 +111,13 @@ export const InstallerIntakeForm = () => {
         if (currentStep === 1) {
             await fetchAddressData(formData.postalCode, formData.houseNumber, formData.houseNumberAddition, updateFormData);
         }
+
+        // If we're on the Contact step (Step 3), submit the form
+        if (currentStep === 3) {
+            await handleSubmit();
+            return;
+        }
+
         if (currentStep < TOTAL_STEPS) {
             setCurrentStep(prev => prev + 1);
         }
@@ -200,7 +207,6 @@ export const InstallerIntakeForm = () => {
                         isSubmitting={isSubmitting}
                         onNext={handleNext}
                         onBack={handleBack}
-                        onSubmit={handleSubmit}
                     />
                 )}
             </div>
@@ -248,7 +254,6 @@ export const InstallerIntakeForm = () => {
                     isSubmitting={isSubmitting}
                     onNext={handleNext}
                     onBack={handleBack}
-                    onSubmit={handleSubmit}
                     isMobile
                 />
             )}

@@ -8,7 +8,6 @@ interface FormNavigationProps {
     isSubmitting: boolean;
     onNext: () => void;
     onBack: () => void;
-    onSubmit: () => void;
     isMobile?: boolean;
     hasOnlyIncompatible?: boolean;
 }
@@ -20,7 +19,6 @@ export const FormNavigation: React.FC<FormNavigationProps> = ({
     isSubmitting,
     onNext,
     onBack,
-    onSubmit,
     isMobile = false,
 }) => {
     const containerClasses = isMobile
@@ -35,11 +33,20 @@ export const FormNavigation: React.FC<FormNavigationProps> = ({
         ? `flex-1 ${currentStep === 1 ? 'invisible' : ''}`
         : currentStep === 1 ? 'invisible' : '';
 
-    const nextButtonClasses = isMobile ? `flex-1 ${currentStep === totalSteps ? 'invisible' : ''}` : `${currentStep === totalSteps ? 'invisible' : ''}`;
+    const nextButtonClasses = isMobile ? 'flex-1' : '';
+
+    // Determine if we're on the final interactive step (step before completion)
+    const isFinalStep = currentStep === totalSteps - 1;
+
+    // Button text logic
+    const getButtonText = () => {
+        if (isSubmitting) return 'Verzenden...';
+        if (isFinalStep) return isMobile ? 'Aanvragen' : 'Besparingsrapport aanvragen';
+        return 'Volgende';
+    };
 
     return (
         <div className={containerClasses}>
-
             <div className={buttonContainerClasses}>
                 <Button
                     variant="secondary"
@@ -50,23 +57,13 @@ export const FormNavigation: React.FC<FormNavigationProps> = ({
                     Terug
                 </Button>
 
-                {currentStep < totalSteps ? (
-                    <Button
-                        onClick={onNext}
-                        disabled={!isStepValid}
-                        className={nextButtonClasses}
-                    >
-                        Volgende
-                    </Button>
-                ) : (
-                    <Button
-                        onClick={onSubmit}
-                        disabled={isSubmitting || !isStepValid}
-                        className={nextButtonClasses}
-                    >
-                        {isSubmitting ? 'Verzenden...' : isMobile ? 'Aanvragen' : 'Besparingsrapport aanvragen'}
-                    </Button>
-                )}
+                <Button
+                    onClick={onNext}
+                    disabled={!isStepValid || isSubmitting}
+                    className={nextButtonClasses}
+                >
+                    {getButtonText()}
+                </Button>
             </div>
         </div>
     );
