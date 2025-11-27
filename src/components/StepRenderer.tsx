@@ -14,6 +14,9 @@ interface StepRendererProps {
     errors: Record<string, string>;
     validateField: (field: keyof FormData, value: string) => void;
     hasApiData: boolean | null;
+    intakeUrl?: string;
+    contactTitle?: string;
+    contactDescription?: string;
 }
 
 export const StepRenderer: React.FC<StepRendererProps> = ({
@@ -23,6 +26,9 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
     errors,
     validateField,
     hasApiData,
+    intakeUrl,
+    contactTitle,
+    contactDescription
 }) => {
     return (
         <div key={currentStep} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -48,10 +54,12 @@ export const StepRenderer: React.FC<StepRendererProps> = ({
                     updateFormData={updateFormData}
                     errors={errors}
                     validateField={validateField}
+                    title={contactTitle}
+                    description={contactDescription}
                 />
             )}
             {currentStep === 6 && (
-                <CompletionStep />
+                <CompletionStep intakeUrl={intakeUrl} />
             )}
         </div>
     );

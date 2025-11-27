@@ -23,9 +23,21 @@ export const InstallerSearchStep: React.FC<InstallerSearchStepProps> = ({ formDa
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const FALLBACK_INSTALLER: Installer = {
+        sfid: '0017R00002ykrRbQAI',
+        name: 'Weheat service',
+        location: 'Duizel',
+        order: 1,
+        tags: ['Voor development/testing'],
+        nationWide: false,
+        distance: 10
+    };
+
     useEffect(() => {
         const fetchInstallers = async () => {
             if (!formData.latitude || !formData.longitude) {
+                console.log('Missing coordinates, using fallback for dev');
+                setInstallers([FALLBACK_INSTALLER]);
                 setIsLoading(false);
                 return;
             }
@@ -40,10 +52,21 @@ export const InstallerSearchStep: React.FC<InstallerSearchStepProps> = ({ formDa
                 }
 
                 const data = await response.json() as { accounts: Installer[] };
-                setInstallers(data.accounts || []);
+
+                if (!data.accounts || data.accounts.length === 0) {
+                    console.log('No installers found, using fallback for dev');
+                    setInstallers([FALLBACK_INSTALLER]);
+                } else {
+                    // Filter out the fallback installer if it's already in the API response to avoid duplicates
+                    const apiInstallers = data.accounts.filter(i => i.sfid !== FALLBACK_INSTALLER.sfid);
+                    // Always include Weheat service at the top
+                    setInstallers([FALLBACK_INSTALLER, ...apiInstallers]);
+                }
             } catch (err) {
                 console.error('Error fetching installers:', err);
-                setError('Er is iets misgegaan bij het ophalen van installateurs.');
+                // Fallback for dev/demo purposes
+                setInstallers([FALLBACK_INSTALLER]);
+                setError(null); // Clear error to show fallback
             } finally {
                 setIsLoading(false);
             }
@@ -98,25 +121,25 @@ export const InstallerSearchStep: React.FC<InstallerSearchStepProps> = ({ formDa
                             key={installer.sfid}
                             selected={isSelected(installer)}
                             onClick={() => handleSelectInstaller(installer)}
-                            className="p-4 flex items-center gap-4 cursor-pointer hover:border-primary-200 transition-colors"
+                            className="flex items-center gap-6 p-4 cursor-pointer"
                         >
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isSelected(installer) ? 'bg-primary-600' : 'bg-primary-50'}`}>
+                            <div className={`p-2 rounded-lg ${isSelected(installer) ? 'bg-primary-600' : 'bg-primary-100'}`}>
                                 {isSelected(installer) ? (
-                                    <Check className="w-5 h-5 text-white" />
+                                    <Check className="w-5 h-5 text-white" strokeWidth={3} />
                                 ) : (
-                                    <MapPin className="w-5 h-5 text-primary-600" />
+                                    <MapPin className="w-5 h-5 text-primary-500" />
                                 )}
                             </div>
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="font-bold text-gray-900">{installer.name}</h3>
+                            <div className="text-left flex-1">
+                                <div className="flex items-center gap-2">
+                                    <div className="font-medium">{installer.name}</div>
                                     {installer.nationWide && (
                                         <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
                                             Landelijk
                                         </span>
                                     )}
                                 </div>
-                                <div className="flex items-center gap-4 text-sm text-gray-500">
+                                <div className="text-sm text-gray-500 flex items-center gap-2">
                                     <span>{installer.location}</span>
                                     <span>•</span>
                                     <span>{Math.round(installer.distance)} km</span>
@@ -124,7 +147,7 @@ export const InstallerSearchStep: React.FC<InstallerSearchStepProps> = ({ formDa
                                 {installer.tags.length > 0 && (
                                     <div className="flex gap-2 mt-2">
                                         {installer.tags.map(tag => (
-                                            <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                                            <span key={tag} className="text-xs font-medium bg-white text-neutral-600 px-2 py-0.5 rounded-full">
                                                 {tag}
                                             </span>
                                         ))}

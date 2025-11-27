@@ -275,6 +275,9 @@ export const MultiStepForm = () => {
                                 errors={errors}
                                 validateField={validateField}
                                 hasApiData={hasApiData}
+                                intakeUrl={`/schedule-intake?postalCode=${formData.postalCode}&houseNumber=${formData.houseNumber}&firstName=${encodeURIComponent(formData.firstName)}&lastName=${encodeURIComponent(formData.lastName)}&email=${encodeURIComponent(formData.email)}`}
+                                contactTitle="Je kunt besparen!"
+                                contactDescription="Laat je gegevens achter en ontvang een persoonlijke besparingsrapport."
                             />
                         )}
                     </div>

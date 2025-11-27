@@ -88,15 +88,36 @@ export const InstallerIntakeForm = () => {
     useEffect(() => {
         const postalCodeParam = searchParams.get('postalCode');
         const houseNumberParam = searchParams.get('houseNumber');
+        const firstNameParam = searchParams.get('firstName');
+        const lastNameParam = searchParams.get('lastName');
+        const emailParam = searchParams.get('email');
+        const installerIdParam = searchParams.get('installerId');
 
         if (postalCodeParam && houseNumberParam && !hasAutoFetched.current && currentStep === 1) {
             hasAutoFetched.current = true;
-            updateFormData({
+
+            const updates: Partial<FormData> = {
                 postalCode: postalCodeParam,
-                houseNumber: houseNumberParam
-            });
+                houseNumber: houseNumberParam,
+            };
+
+            if (firstNameParam) updates.firstName = firstNameParam;
+            if (lastNameParam) updates.lastName = lastNameParam;
+            if (emailParam) updates.email = emailParam;
+
+            // Handle installer pre-selection
+            if (installerIdParam === '0017R00002ykrRbQAI') {
+                updates.selectedInstaller = {
+                    sfid: '0017R00002ykrRbQAI',
+                    name: 'Weheat service'
+                };
+            }
+
+            updateFormData(updates);
+
             fetchAddressData(postalCodeParam, houseNumberParam, undefined, updateFormData).then(() => {
-                setCurrentStep(2);
+                // If installer is selected, skip to contact step (3), otherwise go to search (2)
+                setCurrentStep(installerIdParam ? 3 : 2);
             });
         }
     }, [searchParams, currentStep, fetchAddressData, updateFormData]);
@@ -213,6 +234,8 @@ export const InstallerIntakeForm = () => {
                         validateField={validateField}
                         showPhone={true}
                         showMessage={true}
+                        title="Vul je gegevens in"
+                        description="Zodat de installateur contact met je kan opnemen."
                     />
                 );
             case 4:

@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { FormData } from '../../types/form';
 import { Input } from '../ui/Input';
-import { User, Mail, Phone, MessageSquare, PartyPopper } from 'lucide-react';
-import confetti from 'canvas-confetti';
-
+import { Confetti } from '../ui/Confetti';
+import { User, Mail, Phone, MessageSquare, PartyPopper, Send } from 'lucide-react';
 interface ContactStepProps {
     formData: FormData;
     updateFormData: (data: Partial<FormData>) => void;
@@ -11,6 +10,8 @@ interface ContactStepProps {
     validateField?: (field: keyof FormData, value: string) => void;
     showPhone?: boolean;
     showMessage?: boolean;
+    title?: string;
+    description?: string;
 }
 
 export const ContactStep: React.FC<ContactStepProps> = ({
@@ -19,60 +20,19 @@ export const ContactStep: React.FC<ContactStepProps> = ({
     errors = {},
     validateField,
     showPhone = false,
-    showMessage = false
+    showMessage = false,
+    title = "Je kunt besparen!",
+    description = "Laat je gegevens achter en ontvang een persoonlijke besparingsrapport."
 }) => {
-    useEffect(() => {
-        // Trigger confetti when the component mounts
-        const count = 200;
-
-        // Calculate origin based on viewport - center of left column on desktop
-        const isMobile = window.innerWidth < 768;
-        const defaults = {
-            origin: {
-                x: isMobile ? 0.5 : 0.25, // Center of left column (25% of viewport) on desktop
-                y: 0.7
-            }
-        };
-
-        function fire(particleRatio: number, opts: any) {
-            confetti({
-                ...defaults,
-                ...opts,
-                particleCount: Math.floor(count * particleRatio)
-            });
-        }
-
-        fire(0.25, {
-            spread: 26,
-            startVelocity: 55,
-        });
-        fire(0.2, {
-            spread: 60,
-        });
-        fire(0.35, {
-            spread: 100,
-            decay: 0.91,
-            scalar: 0.8
-        });
-        fire(0.1, {
-            spread: 120,
-            startVelocity: 25,
-            decay: 0.92,
-            scalar: 1.2
-        });
-        fire(0.1, {
-            spread: 120,
-            startVelocity: 45,
-        });
-    }, []);
     return (
         <div className="space-y-6">
+            {!showMessage && <Confetti />}
             <div className="text-center mb-8 mt-6 3xl:mb-12">
                 <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <PartyPopper className="w-6 h-6 text-primary-600" />
+                    {showMessage ? <Send className="w-6 h-6 text-primary-600" /> : <PartyPopper className="w-6 h-6 text-primary-600" />}
                 </div>
-                <h2 className="text-2xl md:text-2xl lg:text-3xl font-medium text-gray-900 mb-2">Je kunt besparen!</h2>
-                <p className="text-gray-500 md:text-lg">Laat je gegevens achter en ontvang een persoonlijke besparingsrapport.</p>
+                <h2 className="text-2xl md:text-2xl lg:text-3xl font-medium text-gray-900 mb-2">{title}</h2>
+                <p className="text-gray-500 md:text-lg">{description}</p>
             </div>
 
             <div className="space-y-4">

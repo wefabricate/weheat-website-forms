@@ -2,16 +2,26 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import { Button } from '../ui/Button';
 
-export const CompletionStep: React.FC = () => {
+interface CompletionStepProps {
+    intakeUrl?: string;
+}
+
+export const CompletionStep: React.FC<CompletionStepProps> = ({ intakeUrl }) => {
     const REDIRECT_URL = 'https://weheat.nl/besparingscheck-test';
 
     const handleRedirectToAdviesgesprek = () => {
-        window.location.href = REDIRECT_URL;
+        if (intakeUrl) {
+            window.location.href = intakeUrl;
+        } else {
+            window.location.href = REDIRECT_URL;
+        }
     };
 
     const handleRedirectToWebsite = () => {
         window.location.href = REDIRECT_URL;
     };
+
+    const isSavingsFlow = !!intakeUrl;
 
     return (
         <div className="space-y-6">
@@ -21,15 +31,20 @@ export const CompletionStep: React.FC = () => {
                 </div>
                 <h2 className="text-2xl md:text-2xl lg:text-3xl font-medium text-gray-900 mb-4">Bedankt voor je aanvraag!</h2>
                 <p className="text-lg md:text-xl text-gray-600 mb-4">
-                    We hebben je gegevens ontvangen! Je ontvangt binnenkort je persoonlijke bespaarrapport in je mailbox.
+                    {isSavingsFlow
+                        ? "We hebben je gegevens ontvangen! Je ontvangt binnenkort je persoonlijke bespaarrapport in je mailbox."
+                        : "We hebben je gegevens ontvangen! De installateur neemt binnenkort contact met je op."
+                    }
                 </p>
             </div>
 
             <div className="flex justify-center gap-4">
-                <Button variant="primary" onClick={handleRedirectToAdviesgesprek} className="flex items-center gap-2">
-                    Plan adviesgesprek
-                </Button>
-                <Button variant="outline" onClick={handleRedirectToWebsite} className="flex items-center gap-2">
+                {isSavingsFlow && (
+                    <Button variant="primary" onClick={handleRedirectToAdviesgesprek} className="flex items-center gap-2">
+                        Plan adviesgesprek
+                    </Button>
+                )}
+                <Button variant={isSavingsFlow ? "outline" : "primary"} onClick={handleRedirectToWebsite} className="flex items-center gap-2">
                     Ga terug naar de weheat.nl
                 </Button>
             </div>
