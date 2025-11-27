@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Check } from 'lucide-react';
 import { Button } from '../ui/Button';
 
@@ -7,11 +8,12 @@ interface CompletionStepProps {
 }
 
 export const CompletionStep: React.FC<CompletionStepProps> = ({ intakeUrl }) => {
+    const router = useRouter();
     const REDIRECT_URL = 'https://weheat.nl/besparingscheck-test';
 
     const handleRedirectToAdviesgesprek = () => {
         if (intakeUrl) {
-            window.location.href = intakeUrl;
+            router.push(intakeUrl);
         } else {
             window.location.href = REDIRECT_URL;
         }
