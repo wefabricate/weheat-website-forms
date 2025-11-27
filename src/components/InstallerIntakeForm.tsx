@@ -7,39 +7,37 @@ import { useSearchParams } from 'next/navigation';
 import { FormData, initialFormData } from '../types/form';
 import { useAddressData } from '../hooks/useAddressData';
 import { useAddressValidation } from '../hooks/useAddressValidation';
-import { validateEmail, validatePhone, VALIDATION_MESSAGES } from '../utils/formValidation';
+import { validateEmail, VALIDATION_MESSAGES } from '../utils/formValidation';
 
-import { StepRenderer } from './StepRenderer';
 import { FormNavigation } from './FormNavigation';
 import { ProgressBar } from './ui/ProgressBar';
-import { CircleX } from 'lucide-react';
 import { LoadingOverlay } from './ui/LoadingOverlay';
 
-import step1Image from '../assets/address.jpeg';
-import step2Image from '../assets/data-check.jpeg';
-import step3Image from '../assets/insulation.jpeg';
-import step4Image from '../assets/heat-distribution.jpeg';
-import step5Image from '../assets/contact.jpeg';
-import step6Image from '../assets/contact.jpeg';
+import { LocationStep } from './steps/LocationStep';
+import { InstallerSearchStep } from './steps/InstallerSearchStep';
+import { ContactStep } from './steps/ContactStep';
+import { CompletionStep } from './steps/CompletionStep';
 
-const TOTAL_STEPS = 6;
+import step1Image from '../assets/address.jpeg';
+import step2Image from '../assets/contact.jpeg'; // Installer search
+import step3Image from '../assets/contact.jpeg'; // Contact
+import step4Image from '../assets/contact.jpeg'; // Completion
+
+const TOTAL_STEPS = 4;
 
 const stepImages: Record<number, any> = {
     1: step1Image,
     2: step2Image,
     3: step3Image,
     4: step4Image,
-    5: step5Image,
-    6: step6Image,
 };
 
-export const MultiStepForm = () => {
+export const InstallerIntakeForm = () => {
     // State
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState<FormData>(initialFormData);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-
 
     // Hooks
     const searchParams = useSearchParams();
@@ -51,12 +49,10 @@ export const MultiStepForm = () => {
     const updateFormData = useCallback((data: Partial<FormData>) => {
         setFormData(prev => {
             const newData = { ...prev, ...data };
-
             // Clear errors when user types
             if (data.email) {
                 setErrors(prev => ({ ...prev, email: '' }));
             }
-
             return newData;
         });
     }, []);
@@ -66,7 +62,6 @@ export const MultiStepForm = () => {
         if (field === 'email' && value && !validateEmail(value)) {
             error = VALIDATION_MESSAGES.EMAIL_INVALID;
         }
-
         setErrors(prev => ({ ...prev, [field]: error }));
     }, []);
 
@@ -75,27 +70,8 @@ export const MultiStepForm = () => {
             case 1:
                 return !!(formData.postalCode && formData.houseNumber && formData.street && formData.city);
             case 2:
-                return !!(
-                    formData.houseType &&
-                    formData.buildYear &&
-                    formData.area &&
-                    formData.energyLabel &&
-                    formData.estimatedGasUsage
-                );
+                return true; // Installer search is view-only/optional selection
             case 3:
-                return true; // Insulation is optional
-            case 4:
-                // Check if heat distribution is selected
-                if (!formData.heatDistribution || formData.heatDistribution.length === 0) {
-                    return false;
-                }
-                // Check if only incompatible systems are selected
-                const incompatibleSystems = ['stadsverwarming', 'luchtverwarming'];
-                const hasOnlyIncompatible = formData.heatDistribution.every(
-                    system => incompatibleSystems.includes(system as string)
-                );
-                return !hasOnlyIncompatible;
-            case 5:
                 const isEmailValid = validateEmail(formData.email);
                 const hasName = !!(formData.firstName && formData.lastName);
                 return hasName && isEmailValid;
@@ -104,12 +80,6 @@ export const MultiStepForm = () => {
         }
     }, [currentStep, formData]);
 
-    // Check for incompatible heating systems (Step 4)
-    const incompatibleSystems = ['stadsverwarming', 'luchtverwarming'];
-    const selectedSystems = formData.heatDistribution || [];
-    const hasOnlyIncompatible = currentStep === 4 && selectedSystems.length > 0 &&
-        selectedSystems.every(system => incompatibleSystems.includes(system));
-
     // Effects
     useEffect(() => {
         const postalCodeParam = searchParams.get('postalCode');
@@ -117,12 +87,10 @@ export const MultiStepForm = () => {
 
         if (postalCodeParam && houseNumberParam && !hasAutoFetched.current && currentStep === 1) {
             hasAutoFetched.current = true;
-
             updateFormData({
                 postalCode: postalCodeParam,
                 houseNumber: houseNumberParam
             });
-
             fetchAddressData(postalCodeParam, houseNumberParam, undefined, updateFormData).then(() => {
                 setCurrentStep(2);
             });
@@ -152,7 +120,6 @@ export const MultiStepForm = () => {
         if (currentStep > 1) {
             const newStep = currentStep - 1;
             if (newStep === 1) {
-                // Reset form data when going back to step 1
                 setFormData(initialFormData);
             }
             setCurrentStep(newStep);
@@ -164,17 +131,39 @@ export const MultiStepForm = () => {
         await new Promise(resolve => setTimeout(resolve, 1500));
         console.log('Form submitted:', formData);
         setIsSubmitting(false);
-        setCurrentStep(6);
+        setCurrentStep(TOTAL_STEPS);
     };
 
+    const renderStep = () => {
+        switch (currentStep) {
+            case 1:
+                return <LocationStep formData={formData} updateFormData={updateFormData} />;
+            case 2:
+                return <InstallerSearchStep formData={formData} updateFormData={updateFormData} />;
+            case 3:
+                return (
+                    <ContactStep
+                        formData={formData}
+                        updateFormData={updateFormData}
+                        errors={errors}
+                        validateField={validateField}
+                    />
+                );
+            case 4:
+                return <CompletionStep />;
+            default:
+                return null;
+        }
+    };
 
+    const showProgress = currentStep > 1 && currentStep < TOTAL_STEPS;
 
     return (
         <div className="min-h-screen flex flex-col md:flex-row">
             {/* Mobile Fixed Header */}
             <div className="fixed top-0 left-0 right-0 z-50 bg-offwhite-50 border-b border-gray-100 px-4 py-3 md:hidden">
-                {currentStep > 1 && currentStep < 5 && (
-                    <ProgressBar currentStep={currentStep - 1} totalSteps={3} />
+                {showProgress && (
+                    <ProgressBar currentStep={currentStep - 1} totalSteps={2} />
                 )}
             </div>
 
@@ -183,8 +172,8 @@ export const MultiStepForm = () => {
                 {/* Desktop Header */}
                 <div className="hidden md:block px-12 pt-12 md:pr-0 pb-0">
                     <div className="mb-8">
-                        {currentStep > 1 && currentStep < 5 && (
-                            <ProgressBar currentStep={currentStep - 1} totalSteps={3} />
+                        {showProgress && (
+                            <ProgressBar currentStep={currentStep - 1} totalSteps={2} />
                         )}
                     </div>
                 </div>
@@ -195,40 +184,15 @@ export const MultiStepForm = () => {
                         {isFetchingData ? (
                             <LoadingOverlay inline />
                         ) : (
-                            <StepRenderer
-                                currentStep={currentStep}
-                                formData={formData}
-                                updateFormData={updateFormData}
-                                errors={errors}
-                                validateField={validateField}
-                                hasApiData={hasApiData}
-                            />
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                {renderStep()}
+                            </div>
                         )}
                     </div>
-                    {hasOnlyIncompatible && (
-                        <div className="mt-16 sticky bottom-0 z-50 transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-2">
-                            <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                                <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0">
-                                        <CircleX className="w-5 h-5 text-red-600 mt-0.5" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-sm font-medium text-red-800 mb-1">
-                                            Je woning is helaas niet geschikt voor een warmtepomp
-                                        </h3>
-                                        <p className="text-sm text-red-700">
-                                            Met alleen <span className="font-bold">{selectedSystems.includes('stadsverwarming') && selectedSystems.includes('luchtverwarming') ? 'stadsverwarming en luchtverwarming' : selectedSystems.includes('stadsverwarming') ? 'stadsverwarming' : 'luchtverwarming'}</span> is het helaas niet mogelijk om een warmtepomp te installeren.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </div>
 
-
                 {/* Desktop Footer */}
-                {!isFetchingData && (
+                {!isFetchingData && currentStep < TOTAL_STEPS && (
                     <FormNavigation
                         currentStep={currentStep}
                         totalSteps={TOTAL_STEPS}
@@ -237,7 +201,6 @@ export const MultiStepForm = () => {
                         onNext={handleNext}
                         onBack={handleBack}
                         onSubmit={handleSubmit}
-                        hasOnlyIncompatible={hasOnlyIncompatible}
                     />
                 )}
             </div>
@@ -245,7 +208,7 @@ export const MultiStepForm = () => {
             {/* Desktop Right Column: Image */}
             <div className="p-12 hidden md:block w-1/2 h-screen flex">
                 <div className="w-full rounded-3xl h-full sticky top-0 overflow-hidden relative">
-                    {[1, 2, 3, 4, 5, 6].map((step) => (
+                    {[1, 2, 3, 4].map((step) => (
                         <div
                             key={step}
                             className={`absolute inset-0 transition-opacity duration-400 ease-in-out ${currentStep === step ? 'opacity-100 z-10' : 'opacity-0 z-0'
@@ -264,44 +227,20 @@ export const MultiStepForm = () => {
             </div>
 
             {/* Mobile Content Area */}
-            <div className="md:hidden pt-16 pb-64 px-2">
+            <div className="md:hidden pt-16 pb-32 px-2">
                 <div className="p-2">
                     {isFetchingData ? (
                         <LoadingOverlay inline />
                     ) : (
-                        <StepRenderer
-                            currentStep={currentStep}
-                            formData={formData}
-                            updateFormData={updateFormData}
-                            errors={errors}
-                            validateField={validateField}
-                            hasApiData={hasApiData}
-                        />
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {renderStep()}
+                        </div>
                     )}
                 </div>
             </div>
 
             {/* Mobile Fixed Footer */}
-            {hasOnlyIncompatible && (
-                <div className="md:hidden fixed bottom-22 left-0 right-0 z-40 px-4 pb-2 transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-2">
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                        <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0">
-                                <CircleX className="w-5 h-5 text-red-600 mt-0.5" />
-                            </div>
-                            <div>
-                                <h3 className="text-sm font-medium text-red-800 mb-1">
-                                    Je woning is helaas niet geschikt voor een warmtepomp
-                                </h3>
-                                <p className="text-sm text-red-700">
-                                    Met <span className="font-bold">{selectedSystems.includes('stadsverwarming') && selectedSystems.includes('luchtverwarming') ? 'stadsverwarming en luchtverwarming' : selectedSystems.includes('stadsverwarming') ? 'stadsverwarming' : 'luchtverwarming'}</span> is het helaas niet mogelijk om een warmtepomp te installeren.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-            {!isFetchingData && (
+            {!isFetchingData && currentStep < TOTAL_STEPS && (
                 <FormNavigation
                     currentStep={currentStep}
                     totalSteps={TOTAL_STEPS}
@@ -311,7 +250,6 @@ export const MultiStepForm = () => {
                     onBack={handleBack}
                     onSubmit={handleSubmit}
                     isMobile
-                    hasOnlyIncompatible={hasOnlyIncompatible}
                 />
             )}
         </div>

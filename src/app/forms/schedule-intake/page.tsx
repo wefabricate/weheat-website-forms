@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
 import { Suspense } from 'react';
-import { MultiStepForm } from '../../../components/MultiStepForm';
+import { InstallerIntakeForm } from '../../../components/InstallerIntakeForm';
 
-export default function Home() {
+export default function ScheduleIntakePage() {
   return (
     <main className="min-h-screen bg-offwhite-50">
-      <Suspense fallback={<div>Laden...</div>}>
-        <MultiStepForm />
+      <Suspense>
+        <InstallerIntakeForm />
       </Suspense>
     </main>
   );
