@@ -22,11 +22,18 @@ export interface FormData {
     // Step 3: Heating System
     heatDistribution: ('stadsverwarming' | 'luchtverwarming' | 'radiatoren' | 'convectoren-vloer' | 'convectoren-muren' | 'vloerverwarming' | 'anders')[];
 
+    // Installer selection (for installer intake form)
+    selectedInstaller?: {
+        sfid: string;
+        name: string;
+    };
+
     // Step 4: Contact
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
+    message?: string;
 }
 
 export const initialFormData: FormData = {
@@ -40,5 +47,6 @@ export const initialFormData: FormData = {
     firstName: '',
     lastName: '',
     email: '',
-    phone: ''
+    phone: '',
+    message: ''
 };

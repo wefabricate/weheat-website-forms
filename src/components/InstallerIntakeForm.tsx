@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { FormData, initialFormData } from '../types/form';
 import { useAddressData } from '../hooks/useAddressData';
 import { useAddressValidation } from '../hooks/useAddressValidation';
-import { validateEmail, VALIDATION_MESSAGES } from '../utils/formValidation';
+import { validateEmail, validatePhone, VALIDATION_MESSAGES } from '../utils/formValidation';
 
 import { FormNavigation } from './FormNavigation';
 import { ProgressBar } from './ui/ProgressBar';
@@ -62,6 +62,9 @@ export const InstallerIntakeForm = () => {
         if (field === 'email' && value && !validateEmail(value)) {
             error = VALIDATION_MESSAGES.EMAIL_INVALID;
         }
+        if (field === 'phone' && value && !validatePhone(value)) {
+            error = VALIDATION_MESSAGES.PHONE_INVALID;
+        }
         setErrors(prev => ({ ...prev, [field]: error }));
     }, []);
 
@@ -74,7 +77,8 @@ export const InstallerIntakeForm = () => {
             case 3:
                 const isEmailValid = validateEmail(formData.email);
                 const hasName = !!(formData.firstName && formData.lastName);
-                return hasName && isEmailValid;
+                const isPhoneValid = validatePhone(formData.phone);
+                return hasName && isEmailValid && isPhoneValid;
             default:
                 return false;
         }
@@ -135,10 +139,63 @@ export const InstallerIntakeForm = () => {
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        console.log('Form submitted:', formData);
-        setIsSubmitting(false);
-        setCurrentStep(TOTAL_STEPS);
+
+        try {
+            // Build full address string
+            const fullAddress = `${formData.street} ${formData.houseNumber}${formData.houseNumberAddition ? formData.houseNumberAddition : ''}, ${formData.postalCode} ${formData.city}`;
+
+            const payload = {
+                triggerType: "form_submission",
+                payload: {
+                    name: "Quote Request",
+                    siteId: "67ed5695314f69c537693240",
+                    data: {
+                        "Address": fullAddress,
+                        "Postcode 7": formData.postalCode,
+                        "Huisnummer 6": formData.houseNumber,
+                        "Toevoeging 6": formData.houseNumberAddition || "",
+                        "Oid 3": formData.selectedInstaller?.sfid || "",
+                        "first_name": formData.firstName,
+                        "last_name": formData.lastName,
+                        "email": formData.email,
+                        "Phone": formData.phone || "",
+                        "Bericht": formData.message || "",
+                        "Zip": formData.postalCode,
+                        "street": `${formData.street} ${formData.houseNumber}${formData.houseNumberAddition ? formData.houseNumberAddition : ''}`,
+                        "place": formData.city || "Nederland",
+                        "sfid": formData.selectedInstaller?.sfid || "",
+                        "company": ""
+                    },
+                    submittedAt: new Date().toISOString(),
+                    id: Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+                    formId: "68138adfbf3aeebbc2a1056a",
+                    formElementId: "37bbb4a4-8ff2-901a-01e6-690165bf6956",
+                    pageId: "67ed5695314f69c53769323d",
+                    publishedPath: "/",
+                    pageUrl: "https://www.weheat.nl/",
+                    schema: []
+                }
+            };
+
+            const response = await fetch('https://defaultafcb403265a34bf5894edb5aeefe64.71.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/7ee5ab6664da4e5bb38e92ce40b8af3c/triggers/manual/paths/invoke?api-version=1&sp=/triggers/manual/run&sv=1.0&sig=wwn7F98vaJWYb9KMOVd_RCfteOTsDjGEidGJCZjfoD8', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`API call failed: ${response.statusText}`);
+            }
+
+            console.log('Installer intake form submitted successfully to Power Automate');
+        } catch (error) {
+            console.error('Error submitting installer intake form:', error);
+        } finally {
+            setIsSubmitting(false);
+            setCurrentStep(TOTAL_STEPS);
+        }
     };
 
     const renderStep = () => {
@@ -154,6 +211,8 @@ export const InstallerIntakeForm = () => {
                         updateFormData={updateFormData}
                         errors={errors}
                         validateField={validateField}
+                        showPhone={true}
+                        showMessage={true}
                     />
                 );
             case 4:

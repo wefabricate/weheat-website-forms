@@ -1,10 +1,12 @@
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
     label?: string;
     error?: string;
     icon?: LucideIcon;
+    multiline?: boolean;
+    rows?: number;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -12,8 +14,21 @@ export const Input: React.FC<InputProps> = ({
     error,
     icon: Icon,
     className = '',
+    multiline = false,
+    rows = 4,
     ...props
 }) => {
+    const baseStyles = `
+        w-full rounded-lg border bg-white text-gray-900 transition-all duration-200
+        placeholder:text-gray-400 focus:outline-none
+        ${Icon ? 'pl-12 pr-4 py-3' : 'px-4 py-3'}
+        ${error
+            ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10'
+            : 'border-gray-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 hover:border-gray-300'
+        }
+        ${className}
+    `;
+
     return (
         <div className="w-full">
             {label && (
@@ -23,23 +38,22 @@ export const Input: React.FC<InputProps> = ({
             )}
             <div className="relative">
                 {Icon && (
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    <div className={`absolute left-4 text-gray-400 ${multiline ? 'top-4' : 'top-1/2 -translate-y-1/2'}`}>
                         <Icon size={20} />
                     </div>
                 )}
-                <input
-                    className={`
-            w-full rounded-lg border bg-white text-gray-900 transition-all duration-200
-            placeholder:text-gray-400 focus:outline-none
-            ${Icon ? 'pl-12 pr-4 py-3' : 'px-4 py-3'}
-            ${error
-                            ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10'
-                            : 'border-gray-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 hover:border-gray-300'
-                        }
-            ${className}
-          `}
-                    {...props}
-                />
+                {multiline ? (
+                    <textarea
+                        className={`${baseStyles} resize-y min-h-[120px]`}
+                        rows={rows}
+                        {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+                    />
+                ) : (
+                    <input
+                        className={baseStyles}
+                        {...(props as React.InputHTMLAttributes<HTMLInputElement>)}
+                    />
+                )}
             </div>
             {error && (
                 <p className="mt-1.5 text-sm text-red-500">{error}</p>

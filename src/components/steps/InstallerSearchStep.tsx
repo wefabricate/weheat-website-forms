@@ -52,6 +52,19 @@ export const InstallerSearchStep: React.FC<InstallerSearchStepProps> = ({ formDa
         fetchInstallers();
     }, [formData.latitude, formData.longitude]);
 
+    const handleSelectInstaller = (installer: Installer) => {
+        updateFormData({
+            selectedInstaller: {
+                sfid: installer.sfid,
+                name: installer.name
+            }
+        });
+    };
+
+    const isSelected = (installer: Installer) => {
+        return formData.selectedInstaller?.sfid === installer.sfid;
+    };
+
     return (
         <div className="space-y-6">
             <div className="text-center mb-8 mt-6">
@@ -59,7 +72,7 @@ export const InstallerSearchStep: React.FC<InstallerSearchStepProps> = ({ formDa
                     Installateurs in de buurt
                 </h2>
                 <p className="text-gray-500 md:text-lg">
-                    We hebben deze installateurs gevonden op basis van jouw locatie.
+                    Selecteer een installateur voor een adviesgesprek.
                 </p>
             </div>
 
@@ -83,10 +96,16 @@ export const InstallerSearchStep: React.FC<InstallerSearchStepProps> = ({ formDa
                     {installers.map((installer) => (
                         <Card
                             key={installer.sfid}
-                            className="p-4 flex items-center gap-4 hover:border-primary-200 transition-colors"
+                            selected={isSelected(installer)}
+                            onClick={() => handleSelectInstaller(installer)}
+                            className="p-4 flex items-center gap-4 cursor-pointer hover:border-primary-200 transition-colors"
                         >
-                            <div className="w-10 h-10 bg-primary-50 rounded-full flex items-center justify-center flex-shrink-0">
-                                <MapPin className="w-5 h-5 text-primary-600" />
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isSelected(installer) ? 'bg-primary-600' : 'bg-primary-50'}`}>
+                                {isSelected(installer) ? (
+                                    <Check className="w-5 h-5 text-white" />
+                                ) : (
+                                    <MapPin className="w-5 h-5 text-primary-600" />
+                                )}
                             </div>
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">

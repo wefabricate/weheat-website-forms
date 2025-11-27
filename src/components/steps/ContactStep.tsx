@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FormData } from '../../types/form';
 import { Input } from '../ui/Input';
-import { User, Mail, Send, PartyPopper } from 'lucide-react';
+import { User, Mail, Phone, MessageSquare, PartyPopper } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface ContactStepProps {
@@ -9,13 +9,17 @@ interface ContactStepProps {
     updateFormData: (data: Partial<FormData>) => void;
     errors?: Record<string, string>;
     validateField?: (field: keyof FormData, value: string) => void;
+    showPhone?: boolean;
+    showMessage?: boolean;
 }
 
 export const ContactStep: React.FC<ContactStepProps> = ({
     formData,
     updateFormData,
     errors = {},
-    validateField
+    validateField,
+    showPhone = false,
+    showMessage = false
 }) => {
     useEffect(() => {
         // Trigger confetti when the component mounts
@@ -101,6 +105,30 @@ export const ContactStep: React.FC<ContactStepProps> = ({
                     icon={Mail}
                     error={errors.email}
                 />
+
+                {showPhone && (
+                    <Input
+                        label="Telefoonnummer"
+                        type="tel"
+                        placeholder="06 12345678"
+                        value={formData.phone}
+                        onChange={(e) => updateFormData({ phone: e.target.value })}
+                        onBlur={(e) => validateField?.('phone', e.target.value)}
+                        icon={Phone}
+                        error={errors.phone}
+                    />
+                )}
+
+                {showMessage && (
+                    <Input
+                        label="Bericht (optioneel)"
+                        placeholder="Waar kan de installateur je mee helpen?"
+                        value={formData.message || ''}
+                        onChange={(e) => updateFormData({ message: e.target.value })}
+                        icon={MessageSquare}
+                        multiline
+                    />
+                )}
             </div>
         </div>
     );
