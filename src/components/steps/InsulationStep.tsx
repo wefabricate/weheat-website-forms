@@ -30,7 +30,7 @@ export const InsulationStep: React.FC<InsulationStepProps> = ({ formData, update
 
     return (
         <div className="space-y-8">
-            <div className="text-center mb-8 mt-12">
+            <div className="text-center mb-8 mt-6 3xl:mb-12">
                 <h2 className="text-2xl md:text-2xl lg:text-3xl font-medium text-gray-900 mb-2">Hoe is je huis geïsoleerd?</h2>
                 <p className="text-gray-500 md:text-lg">Meerdere antwoorden mogelijk</p>
             </div>

@@ -9,7 +9,6 @@ export interface FormData {
     // API enriched data
     area?: string;
     energyLabel?: string;
-    estimatedEnergyUsage?: number;
     estimatedGasUsage?: number;
     latitude?: string;
     longitude?: string;

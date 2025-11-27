@@ -12,23 +12,25 @@ import { validateEmail, validatePhone, VALIDATION_MESSAGES } from '../utils/form
 import { StepRenderer } from './StepRenderer';
 import { FormNavigation } from './FormNavigation';
 import { ProgressBar } from './ui/ProgressBar';
-import { Button } from './ui/Button';
+import { CircleX } from 'lucide-react';
 import { LoadingOverlay } from './ui/LoadingOverlay';
 
-import step1Image from '../assets/blackbird-2.jpg';
-import step2Image from '../assets/blackbird-1.jpg';
-import step3Image from '../assets/sparrow-1.jpg';
-import step4Image from '../assets/sparrow-2.jpeg';
+import step1Image from '../assets/address.jpeg';
+import step2Image from '../assets/data-check.jpeg';
+import step3Image from '../assets/insulation.jpeg';
+import step4Image from '../assets/heat-distribution.jpeg';
+import step5Image from '../assets/contact.jpeg';
+import step6Image from '../assets/contact.jpeg';
 
 const TOTAL_STEPS = 6;
 
 const stepImages: Record<number, any> = {
     1: step1Image,
     2: step2Image,
-    3: step2Image, // Reuse step 2 image for insulation
-    4: step3Image,
-    5: step4Image,
-    6: step4Image, // Reuse step 4 image for completion
+    3: step3Image,
+    4: step4Image,
+    5: step5Image,
+    6: step6Image,
 };
 
 export const MultiStepForm = () => {
@@ -54,9 +56,6 @@ export const MultiStepForm = () => {
             if (data.email) {
                 setErrors(prev => ({ ...prev, email: '' }));
             }
-            if (data.phone) {
-                setErrors(prev => ({ ...prev, phone: '' }));
-            }
 
             return newData;
         });
@@ -66,9 +65,6 @@ export const MultiStepForm = () => {
         let error = '';
         if (field === 'email' && value && !validateEmail(value)) {
             error = VALIDATION_MESSAGES.EMAIL_INVALID;
-        }
-        if (field === 'phone' && value && !validatePhone(value)) {
-            error = VALIDATION_MESSAGES.PHONE_INVALID;
         }
 
         setErrors(prev => ({ ...prev, [field]: error }));
@@ -84,11 +80,10 @@ export const MultiStepForm = () => {
                     formData.buildYear &&
                     formData.area &&
                     formData.energyLabel &&
-                    formData.estimatedGasUsage &&
-                    formData.estimatedEnergyUsage
+                    formData.estimatedGasUsage
                 );
             case 3:
-                return !!(formData.insulation && formData.insulation.length > 0);
+                return true; // Insulation is optional
             case 4:
                 // Check if heat distribution is selected
                 if (!formData.heatDistribution || formData.heatDistribution.length === 0) {
@@ -102,13 +97,18 @@ export const MultiStepForm = () => {
                 return !hasOnlyIncompatible;
             case 5:
                 const isEmailValid = validateEmail(formData.email);
-                const isPhoneValid = validatePhone(formData.phone);
                 const hasName = !!(formData.firstName && formData.lastName);
-                return hasName && isEmailValid && isPhoneValid;
+                return hasName && isEmailValid;
             default:
                 return false;
         }
     }, [currentStep, formData]);
+
+    // Check for incompatible heating systems (Step 4)
+    const incompatibleSystems = ['stadsverwarming', 'luchtverwarming'];
+    const selectedSystems = formData.heatDistribution || [];
+    const hasOnlyIncompatible = currentStep === 4 && selectedSystems.length > 0 &&
+        selectedSystems.every(system => incompatibleSystems.includes(system));
 
     // Effects
     useEffect(() => {
@@ -150,7 +150,12 @@ export const MultiStepForm = () => {
 
     const handleBack = () => {
         if (currentStep > 1) {
-            setCurrentStep(prev => prev - 1);
+            const newStep = currentStep - 1;
+            if (newStep === 1) {
+                // Reset form data when going back to step 1
+                setFormData(initialFormData);
+            }
+            setCurrentStep(newStep);
         }
     };
 
@@ -168,7 +173,9 @@ export const MultiStepForm = () => {
         <div className="min-h-screen flex flex-col md:flex-row">
             {/* Mobile Fixed Header */}
             <div className="fixed top-0 left-0 right-0 z-50 bg-offwhite-50 border-b border-gray-100 px-4 py-3 md:hidden">
-                <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
+                {currentStep > 1 && currentStep < 5 && (
+                    <ProgressBar currentStep={currentStep - 1} totalSteps={3} />
+                )}
             </div>
 
             {/* Desktop Left Column: Form */}
@@ -176,7 +183,9 @@ export const MultiStepForm = () => {
                 {/* Desktop Header */}
                 <div className="hidden md:block px-12 pt-12 md:pr-0 pb-0">
                     <div className="mb-8">
-                        <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
+                        {currentStep > 1 && currentStep < 5 && (
+                            <ProgressBar currentStep={currentStep - 1} totalSteps={3} />
+                        )}
                     </div>
                 </div>
 
@@ -196,7 +205,27 @@ export const MultiStepForm = () => {
                             />
                         )}
                     </div>
+                    {hasOnlyIncompatible && (
+                        <div className="mt-16 sticky bottom-0 z-50 transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-2">
+                            <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                                <div className="flex items-start gap-3">
+                                    <div className="flex-shrink-0">
+                                        <CircleX className="w-5 h-5 text-red-600 mt-0.5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-medium text-red-800 mb-1">
+                                            Je woning is helaas niet geschikt voor een warmtepomp
+                                        </h3>
+                                        <p className="text-sm text-red-700">
+                                            Met alleen <span className="font-bold">{selectedSystems.includes('stadsverwarming') && selectedSystems.includes('luchtverwarming') ? 'stadsverwarming en luchtverwarming' : selectedSystems.includes('stadsverwarming') ? 'stadsverwarming' : 'luchtverwarming'}</span> is het helaas niet mogelijk om een warmtepomp te installeren.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
+
 
                 {/* Desktop Footer */}
                 {!isFetchingData && (
@@ -208,6 +237,7 @@ export const MultiStepForm = () => {
                         onNext={handleNext}
                         onBack={handleBack}
                         onSubmit={handleSubmit}
+                        hasOnlyIncompatible={hasOnlyIncompatible}
                     />
                 )}
             </div>
@@ -234,7 +264,7 @@ export const MultiStepForm = () => {
             </div>
 
             {/* Mobile Content Area */}
-            <div className="md:hidden pt-16 pb-24 px-2">
+            <div className="md:hidden pt-16 pb-64 px-2">
                 <div className="p-2">
                     {isFetchingData ? (
                         <LoadingOverlay inline />
@@ -252,6 +282,25 @@ export const MultiStepForm = () => {
             </div>
 
             {/* Mobile Fixed Footer */}
+            {hasOnlyIncompatible && (
+                <div className="md:hidden fixed bottom-22 left-0 right-0 z-40 px-4 pb-2 transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-bottom-2">
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                        <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0">
+                                <CircleX className="w-5 h-5 text-red-600 mt-0.5" />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-medium text-red-800 mb-1">
+                                    Je woning is helaas niet geschikt voor een warmtepomp
+                                </h3>
+                                <p className="text-sm text-red-700">
+                                    Met <span className="font-bold">{selectedSystems.includes('stadsverwarming') && selectedSystems.includes('luchtverwarming') ? 'stadsverwarming en luchtverwarming' : selectedSystems.includes('stadsverwarming') ? 'stadsverwarming' : 'luchtverwarming'}</span> is het helaas niet mogelijk om een warmtepomp te installeren.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {!isFetchingData && (
                 <FormNavigation
                     currentStep={currentStep}

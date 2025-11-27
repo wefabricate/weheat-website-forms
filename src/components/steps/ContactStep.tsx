@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FormData } from '../../types/form';
 import { Input } from '../ui/Input';
-import { User, Mail, Phone, Send, PartyPopper } from 'lucide-react';
+import { User, Mail, Send, PartyPopper } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface ContactStepProps {
@@ -63,7 +63,7 @@ export const ContactStep: React.FC<ContactStepProps> = ({
     }, []);
     return (
         <div className="space-y-6">
-            <div className="text-center mb-8 mt-12">
+            <div className="text-center mb-8 mt-6 3xl:mb-12">
                 <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <PartyPopper className="w-6 h-6 text-primary-600" />
                 </div>
@@ -100,17 +100,6 @@ export const ContactStep: React.FC<ContactStepProps> = ({
                     onBlur={(e) => validateField?.('email', e.target.value)}
                     icon={Mail}
                     error={errors.email}
-                />
-
-                <Input
-                    label="Telefoonnummer"
-                    type="tel"
-                    placeholder="06 12345678"
-                    value={formData.phone}
-                    onChange={(e) => updateFormData({ phone: e.target.value })}
-                    onBlur={(e) => validateField?.('phone', e.target.value)}
-                    icon={Phone}
-                    error={errors.phone}
                 />
             </div>
         </div>

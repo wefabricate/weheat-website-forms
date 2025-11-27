@@ -10,6 +10,7 @@ interface FormNavigationProps {
     onBack: () => void;
     onSubmit: () => void;
     isMobile?: boolean;
+    hasOnlyIncompatible?: boolean;
 }
 
 export const FormNavigation: React.FC<FormNavigationProps> = ({
@@ -24,7 +25,7 @@ export const FormNavigation: React.FC<FormNavigationProps> = ({
 }) => {
     const containerClasses = isMobile
         ? "fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 p-4 md:hidden safe-area-bottom shadow-2xl"
-        : "hidden md:block pb-12 pt-8 ml-12 border-t border-gray-100";
+        : "hidden md:block pb-12 pt-8 ml-12 border-t border-neutral-200";
 
     const buttonContainerClasses = isMobile
         ? "flex gap-3"
@@ -34,10 +35,11 @@ export const FormNavigation: React.FC<FormNavigationProps> = ({
         ? `flex-1 ${currentStep === 1 ? 'invisible' : ''}`
         : currentStep === 1 ? 'invisible' : '';
 
-    const nextButtonClasses = isMobile ? "flex-1" : "";
+    const nextButtonClasses = isMobile ? `flex-1 ${currentStep === totalSteps ? 'invisible' : ''}` : `${currentStep === totalSteps ? 'invisible' : ''}`;
 
     return (
         <div className={containerClasses}>
+
             <div className={buttonContainerClasses}>
                 <Button
                     variant="secondary"

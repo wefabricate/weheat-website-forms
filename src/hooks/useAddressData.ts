@@ -5,7 +5,6 @@ interface EnrichedAddressData {
     area: string;
     build_year: string;
     energy_label: string;
-    estimated_energy_usage: number;
     estimated_gas_usage: number;
     latitude: string;
     longitude: string;
@@ -87,7 +86,6 @@ export const useAddressData = () => {
                 updateFormData({
                     area: data.area,
                     energyLabel: data.energy_label,
-                    estimatedEnergyUsage: data.estimated_energy_usage,
                     estimatedGasUsage: data.estimated_gas_usage,
                     latitude: data.latitude,
                     longitude: data.longitude,
