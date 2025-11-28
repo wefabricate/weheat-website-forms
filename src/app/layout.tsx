@@ -3,6 +3,8 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { DevLinkProvider } from "@/devlink/DevLinkProvider";
+import { GoogleTagManager } from '@next/third-parties/google'
+
 
 const inter = Inter({
     subsets: ["latin"],
@@ -47,6 +49,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <GoogleTagManager gtmId="GTM-W5VXJ8D" />
             <body
                 className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${sharpGrotesk.variable} antialiased`}
             >
