@@ -289,6 +289,7 @@ export const InstallerIntakeForm = () => {
                         isSubmitting={isSubmitting}
                         onNext={handleNext}
                         onBack={handleBack}
+                        customButtonText="Plan adviesgesprek"
                     />
                 )}
             </div>
@@ -337,6 +338,7 @@ export const InstallerIntakeForm = () => {
                     onNext={handleNext}
                     onBack={handleBack}
                     isMobile
+                    customButtonText="Plan adviesgesprek"
                 />
             )}
         </div>

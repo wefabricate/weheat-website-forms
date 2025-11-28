@@ -10,6 +10,7 @@ interface FormNavigationProps {
     onBack: () => void;
     isMobile?: boolean;
     hasOnlyIncompatible?: boolean;
+    customButtonText?: string;
 }
 
 export const FormNavigation: React.FC<FormNavigationProps> = ({
@@ -20,6 +21,7 @@ export const FormNavigation: React.FC<FormNavigationProps> = ({
     onNext,
     onBack,
     isMobile = false,
+    customButtonText,
 }) => {
     const containerClasses = isMobile
         ? "fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 p-4 md:hidden safe-area-bottom shadow-2xl"
@@ -41,6 +43,7 @@ export const FormNavigation: React.FC<FormNavigationProps> = ({
     // Button text logic
     const getButtonText = () => {
         if (isSubmitting) return 'Verzenden...';
+        if (isFinalStep && customButtonText) return customButtonText;
         if (isFinalStep) return isMobile ? 'Aanvragen' : 'Besparingsrapport aanvragen';
         return 'Volgende';
     };
