@@ -1,17 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { trackFormComplete, trackCTAClick } from '../../utils/gtm';
 
 interface CompletionStepProps {
     intakeUrl?: string;
+    source?: string;
 }
 
-export const CompletionStep: React.FC<CompletionStepProps> = ({ intakeUrl }) => {
+export const CompletionStep: React.FC<CompletionStepProps> = ({ intakeUrl, source }) => {
     const router = useRouter();
     const REDIRECT_URL = 'https://weheat.nl/besparingscheck-test';
 
+    const isSavingsFlow = !!intakeUrl;
+
+    // Track form completion when component mounts
+    useEffect(() => {
+        trackFormComplete(
+            isSavingsFlow ? 'savings' : 'intake',
+            undefined,
+            source ? { source } : undefined
+        );
+    }, [isSavingsFlow, source]);
+
     const handleRedirectToAdviesgesprek = () => {
+        trackCTAClick(
+            isSavingsFlow ? 'savings' : 'intake',
+            'Plan adviesgesprek',
+            intakeUrl || REDIRECT_URL
+        );
+
         if (intakeUrl) {
             router.push(intakeUrl);
         } else {
@@ -20,10 +39,14 @@ export const CompletionStep: React.FC<CompletionStepProps> = ({ intakeUrl }) => 
     };
 
     const handleRedirectToWebsite = () => {
+        trackCTAClick(
+            isSavingsFlow ? 'savings' : 'intake',
+            'Ga terug naar weheat.nl',
+            REDIRECT_URL
+        );
+
         window.location.href = REDIRECT_URL;
     };
-
-    const isSavingsFlow = !!intakeUrl;
 
     return (
         <div className="space-y-6">

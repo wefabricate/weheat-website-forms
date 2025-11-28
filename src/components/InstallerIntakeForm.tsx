@@ -8,6 +8,7 @@ import { FormData, initialFormData } from '../types/form';
 import { useAddressData } from '../hooks/useAddressData';
 import { useAddressValidation } from '../hooks/useAddressValidation';
 import { validateEmail, validatePhone, VALIDATION_MESSAGES } from '../utils/formValidation';
+import { trackFormStart, trackStepView, trackStepComplete, trackFormSubmit, trackStepNavigation } from '../utils/gtm';
 
 import { FormNavigation } from './FormNavigation';
 import { ProgressBar } from './ui/ProgressBar';
@@ -38,6 +39,8 @@ export const InstallerIntakeForm = () => {
     const [formData, setFormData] = useState<FormData>(initialFormData);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [source, setSource] = useState<string>('direct');
+    const hasTrackedStart = useRef(false);
 
     // Hooks
     const searchParams = useSearchParams();
@@ -85,6 +88,36 @@ export const InstallerIntakeForm = () => {
     }, [currentStep, formData]);
 
     // Effects
+    // Track form start with source detection
+    useEffect(() => {
+        if (!hasTrackedStart.current) {
+            hasTrackedStart.current = true;
+
+            // Check for explicit source parameter first
+            const sourceParam = searchParams.get('source');
+
+            // If no explicit source, detect if this is coming from savings flow based on prefilled data
+            const postalCodeParam = searchParams.get('postalCode');
+            const firstNameParam = searchParams.get('firstName');
+            const emailParam = searchParams.get('email');
+            const hasPrefillData = !!(postalCodeParam && firstNameParam && emailParam);
+
+            const detectedSource = sourceParam || (hasPrefillData ? 'savings_flow' : 'direct');
+            setSource(detectedSource);
+
+            trackFormStart('intake', {
+                source: detectedSource,
+                has_prefilled_data: hasPrefillData
+            });
+        }
+    }, [searchParams]);
+
+    // Track step views
+    useEffect(() => {
+        const stepNames = ['Location', 'Installer Search', 'Contact', 'Completion'];
+        trackStepView('intake', currentStep, stepNames[currentStep - 1]);
+    }, [currentStep]);
+
     useEffect(() => {
         const postalCodeParam = searchParams.get('postalCode');
         const houseNumberParam = searchParams.get('houseNumber');
@@ -133,9 +166,20 @@ export const InstallerIntakeForm = () => {
 
     // Handlers
     const handleNext = async () => {
+        const stepNames = ['Location', 'Installer Search', 'Contact', 'Completion'];
+
+        // Track step completion before moving forward
+        const stepData: Record<string, any> = {};
         if (currentStep === 1) {
             await fetchAddressData(formData.postalCode, formData.houseNumber, formData.houseNumberAddition, updateFormData);
+            stepData.postalCode = formData.postalCode;
+            stepData.houseNumber = formData.houseNumber;
+        } else if (currentStep === 2) {
+            stepData.selectedInstaller = formData.selectedInstaller;
         }
+
+        trackStepComplete('intake', currentStep, stepNames[currentStep - 1], stepData);
+        trackStepNavigation('intake', 'forward', currentStep, currentStep + 1);
 
         // If we're on the Contact step (Step 3), submit the form
         if (currentStep === 3) {
@@ -151,6 +195,7 @@ export const InstallerIntakeForm = () => {
     const handleBack = () => {
         if (currentStep > 1) {
             const newStep = currentStep - 1;
+            trackStepNavigation('intake', 'backward', currentStep, newStep);
             if (newStep === 1) {
                 setFormData(initialFormData);
             }
@@ -160,6 +205,26 @@ export const InstallerIntakeForm = () => {
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
+
+        // Detect source for submission tracking
+        const sourceParam = searchParams.get('source');
+        const postalCodeParam = searchParams.get('postalCode');
+        const firstNameParam = searchParams.get('firstName');
+        const emailParam = searchParams.get('email');
+        const hasPrefillData = !!(postalCodeParam && firstNameParam && emailParam);
+        const source = sourceParam || (hasPrefillData ? 'savings_flow' : 'direct');
+
+        // Track form submission
+        trackFormSubmit('intake', {
+            postalCode: formData.postalCode,
+            houseNumber: formData.houseNumber,
+            selectedInstaller: formData.selectedInstaller,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            source: source
+        });
 
         try {
             // Build full address string
@@ -239,7 +304,7 @@ export const InstallerIntakeForm = () => {
                     />
                 );
             case 4:
-                return <CompletionStep />;
+                return <CompletionStep source={source} />;
             default:
                 return null;
         }

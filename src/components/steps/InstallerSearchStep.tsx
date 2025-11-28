@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FormData } from '../../types/form';
 import { MapPin, Check, Loader2, AlertCircle } from 'lucide-react';
 import { Card } from '../ui/Card';
+import { trackInstallerSelection } from '../../utils/gtm';
 
 interface Installer {
     sfid: string;
@@ -76,6 +77,9 @@ export const InstallerSearchStep: React.FC<InstallerSearchStepProps> = ({ formDa
     }, [formData.latitude, formData.longitude]);
 
     const handleSelectInstaller = (installer: Installer) => {
+        // Track installer selection
+        trackInstallerSelection(installer.name, installer.sfid);
+
         updateFormData({
             selectedInstaller: {
                 sfid: installer.sfid,

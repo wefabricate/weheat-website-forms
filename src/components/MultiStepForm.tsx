@@ -8,6 +8,7 @@ import { FormData, initialFormData } from '../types/form';
 import { useAddressData } from '../hooks/useAddressData';
 import { useAddressValidation } from '../hooks/useAddressValidation';
 import { validateEmail, validatePhone, VALIDATION_MESSAGES } from '../utils/formValidation';
+import { trackFormStart, trackStepView, trackStepComplete, trackFormSubmit, trackStepNavigation } from '../utils/gtm';
 
 import { StepRenderer } from './StepRenderer';
 import { FormNavigation } from './FormNavigation';
@@ -39,7 +40,7 @@ export const MultiStepForm = () => {
     const [formData, setFormData] = useState<FormData>(initialFormData);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const hasTrackedStart = useRef(false);
 
     // Hooks
     const searchParams = useSearchParams();
@@ -111,6 +112,20 @@ export const MultiStepForm = () => {
         selectedSystems.every(system => incompatibleSystems.includes(system));
 
     // Effects
+    // Track form start
+    useEffect(() => {
+        if (!hasTrackedStart.current) {
+            hasTrackedStart.current = true;
+            trackFormStart('savings');
+        }
+    }, []);
+
+    // Track step views
+    useEffect(() => {
+        const stepNames = ['Location', 'Data Review', 'Insulation', 'Heating System', 'Contact', 'Completion'];
+        trackStepView('savings', currentStep, stepNames[currentStep - 1]);
+    }, [currentStep]);
+
     useEffect(() => {
         const postalCodeParam = searchParams.get('postalCode');
         const houseNumberParam = searchParams.get('houseNumber');
@@ -140,9 +155,26 @@ export const MultiStepForm = () => {
 
     // Handlers
     const handleNext = async () => {
+        const stepNames = ['Location', 'Data Review', 'Insulation', 'Heating System', 'Contact', 'Completion'];
+
+        // Track step completion before moving forward
+        const stepData: Record<string, any> = {};
         if (currentStep === 1) {
             await fetchAddressData(formData.postalCode, formData.houseNumber, formData.houseNumberAddition, updateFormData);
+            stepData.postalCode = formData.postalCode;
+            stepData.houseNumber = formData.houseNumber;
+        } else if (currentStep === 2) {
+            stepData.houseType = formData.houseType;
+            stepData.buildYear = formData.buildYear;
+            stepData.energyLabel = formData.energyLabel;
+        } else if (currentStep === 3) {
+            stepData.insulation = formData.insulation;
+        } else if (currentStep === 4) {
+            stepData.heatDistribution = formData.heatDistribution;
         }
+
+        trackStepComplete('savings', currentStep, stepNames[currentStep - 1], stepData);
+        trackStepNavigation('savings', 'forward', currentStep, currentStep + 1);
 
         // If we're on the Contact step (Step 5), submit the form
         if (currentStep === 5) {
@@ -158,6 +190,7 @@ export const MultiStepForm = () => {
     const handleBack = () => {
         if (currentStep > 1) {
             const newStep = currentStep - 1;
+            trackStepNavigation('savings', 'backward', currentStep, newStep);
             if (newStep === 1) {
                 // Reset form data when going back to step 1
                 setFormData(initialFormData);
@@ -168,6 +201,18 @@ export const MultiStepForm = () => {
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
+
+        // Track form submission
+        trackFormSubmit('savings', {
+            postalCode: formData.postalCode,
+            houseNumber: formData.houseNumber,
+            houseType: formData.houseType,
+            buildYear: formData.buildYear,
+            energyLabel: formData.energyLabel,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+        });
 
         try {
             const payload = {
@@ -275,7 +320,7 @@ export const MultiStepForm = () => {
                                 errors={errors}
                                 validateField={validateField}
                                 hasApiData={hasApiData}
-                                intakeUrl={`/schedule-intake?postalCode=${formData.postalCode}&houseNumber=${formData.houseNumber}&firstName=${encodeURIComponent(formData.firstName)}&lastName=${encodeURIComponent(formData.lastName)}&email=${encodeURIComponent(formData.email)}`}
+                                intakeUrl={`/schedule-intake?source=savings_flow&postalCode=${formData.postalCode}&houseNumber=${formData.houseNumber}&firstName=${encodeURIComponent(formData.firstName)}&lastName=${encodeURIComponent(formData.lastName)}&email=${encodeURIComponent(formData.email)}`}
                                 contactTitle="Je kunt besparen!"
                                 contactDescription="Laat je gegevens achter en ontvang een persoonlijke besparingsrapport."
                             />
