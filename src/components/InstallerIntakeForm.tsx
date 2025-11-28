@@ -8,7 +8,7 @@ import { FormData, initialFormData } from '../types/form';
 import { useAddressData } from '../hooks/useAddressData';
 import { useAddressValidation } from '../hooks/useAddressValidation';
 import { validateEmail, validatePhone, VALIDATION_MESSAGES } from '../utils/formValidation';
-import { trackFormStart, trackStepView, trackStepComplete, trackFormSubmit, trackStepNavigation } from '../utils/gtm';
+import { trackEvent } from '../utils/gtm';
 
 import { FormNavigation } from './FormNavigation';
 import { ProgressBar } from './ui/ProgressBar';
@@ -105,7 +105,7 @@ export const InstallerIntakeForm = () => {
             const detectedSource = sourceParam || (hasPrefillData ? 'savings_flow' : 'direct');
             setSource(detectedSource);
 
-            trackFormStart('intake', {
+            trackEvent('intake_start', {
                 source: detectedSource,
                 has_prefilled_data: hasPrefillData
             });
@@ -114,8 +114,16 @@ export const InstallerIntakeForm = () => {
 
     // Track step views
     useEffect(() => {
-        const stepNames = ['Location', 'Installer Search', 'Contact', 'Completion'];
-        trackStepView('intake', currentStep, stepNames[currentStep - 1]);
+        const stepEvents = [
+            'intake_step_1_location',
+            'intake_step_2_installers',
+            'intake_step_3_contact',
+            'intake_step_4_completion'
+        ];
+
+        if (currentStep <= stepEvents.length) {
+            trackEvent(stepEvents[currentStep - 1]);
+        }
     }, [currentStep]);
 
     useEffect(() => {
@@ -166,8 +174,6 @@ export const InstallerIntakeForm = () => {
 
     // Handlers
     const handleNext = async () => {
-        const stepNames = ['Location', 'Installer Search', 'Contact', 'Completion'];
-
         // Track step completion before moving forward
         const stepData: Record<string, any> = {};
         if (currentStep === 1) {
@@ -177,9 +183,6 @@ export const InstallerIntakeForm = () => {
         } else if (currentStep === 2) {
             stepData.selectedInstaller = formData.selectedInstaller;
         }
-
-        trackStepComplete('intake', currentStep, stepNames[currentStep - 1], stepData);
-        trackStepNavigation('intake', 'forward', currentStep, currentStep + 1);
 
         // If we're on the Contact step (Step 3), submit the form
         if (currentStep === 3) {
@@ -195,7 +198,6 @@ export const InstallerIntakeForm = () => {
     const handleBack = () => {
         if (currentStep > 1) {
             const newStep = currentStep - 1;
-            trackStepNavigation('intake', 'backward', currentStep, newStep);
             if (newStep === 1) {
                 setFormData(initialFormData);
             }
@@ -215,7 +217,7 @@ export const InstallerIntakeForm = () => {
         const source = sourceParam || (hasPrefillData ? 'savings_flow' : 'direct');
 
         // Track form submission
-        trackFormSubmit('intake', {
+        trackEvent('intake_submit', {
             postalCode: formData.postalCode,
             houseNumber: formData.houseNumber,
             selectedInstaller: formData.selectedInstaller,

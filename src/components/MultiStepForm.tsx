@@ -8,7 +8,7 @@ import { FormData, initialFormData } from '../types/form';
 import { useAddressData } from '../hooks/useAddressData';
 import { useAddressValidation } from '../hooks/useAddressValidation';
 import { validateEmail, validatePhone, VALIDATION_MESSAGES } from '../utils/formValidation';
-import { trackFormStart, trackStepView, trackStepComplete, trackFormSubmit, trackStepNavigation } from '../utils/gtm';
+import { trackEvent } from '../utils/gtm';
 
 import { StepRenderer } from './StepRenderer';
 import { FormNavigation } from './FormNavigation';
@@ -116,14 +116,24 @@ export const MultiStepForm = () => {
     useEffect(() => {
         if (!hasTrackedStart.current) {
             hasTrackedStart.current = true;
-            trackFormStart('savings');
+            trackEvent('savings_start');
         }
     }, []);
 
     // Track step views
     useEffect(() => {
-        const stepNames = ['Location', 'Data Review', 'Insulation', 'Heating System', 'Contact', 'Completion'];
-        trackStepView('savings', currentStep, stepNames[currentStep - 1]);
+        const stepEvents = [
+            'savings_step_1_location',
+            'savings_step_2_data',
+            'savings_step_3_insulation',
+            'savings_step_4_heating',
+            'savings_step_5_contact',
+            'savings_step_6_completion'
+        ];
+
+        if (currentStep <= stepEvents.length) {
+            trackEvent(stepEvents[currentStep - 1]);
+        }
     }, [currentStep]);
 
     useEffect(() => {
@@ -155,8 +165,6 @@ export const MultiStepForm = () => {
 
     // Handlers
     const handleNext = async () => {
-        const stepNames = ['Location', 'Data Review', 'Insulation', 'Heating System', 'Contact', 'Completion'];
-
         // Track step completion before moving forward
         const stepData: Record<string, any> = {};
         if (currentStep === 1) {
@@ -173,9 +181,6 @@ export const MultiStepForm = () => {
             stepData.heatDistribution = formData.heatDistribution;
         }
 
-        trackStepComplete('savings', currentStep, stepNames[currentStep - 1], stepData);
-        trackStepNavigation('savings', 'forward', currentStep, currentStep + 1);
-
         // If we're on the Contact step (Step 5), submit the form
         if (currentStep === 5) {
             await handleSubmit();
@@ -190,7 +195,6 @@ export const MultiStepForm = () => {
     const handleBack = () => {
         if (currentStep > 1) {
             const newStep = currentStep - 1;
-            trackStepNavigation('savings', 'backward', currentStep, newStep);
             if (newStep === 1) {
                 // Reset form data when going back to step 1
                 setFormData(initialFormData);
@@ -203,7 +207,7 @@ export const MultiStepForm = () => {
         setIsSubmitting(true);
 
         // Track form submission
-        trackFormSubmit('savings', {
+        trackEvent('savings_submit', {
             postalCode: formData.postalCode,
             houseNumber: formData.houseNumber,
             houseType: formData.houseType,

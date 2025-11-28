@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { trackFormComplete, trackCTAClick } from '../../utils/gtm';
+import { trackEvent } from '../../utils/gtm';
 
 interface CompletionStepProps {
     intakeUrl?: string;
@@ -17,19 +17,15 @@ export const CompletionStep: React.FC<CompletionStepProps> = ({ intakeUrl, sourc
 
     // Track form completion when component mounts
     useEffect(() => {
-        trackFormComplete(
-            isSavingsFlow ? 'savings' : 'intake',
-            undefined,
-            source ? { source } : undefined
-        );
+        trackEvent(isSavingsFlow ? 'savings_complete' : 'intake_complete', {
+            source: source
+        });
     }, [isSavingsFlow, source]);
 
     const handleRedirectToAdviesgesprek = () => {
-        trackCTAClick(
-            isSavingsFlow ? 'savings' : 'intake',
-            'Plan adviesgesprek',
-            intakeUrl || REDIRECT_URL
-        );
+        trackEvent(isSavingsFlow ? 'savings_cta_advice' : 'intake_cta_advice', {
+            destination: intakeUrl || REDIRECT_URL
+        });
 
         if (intakeUrl) {
             router.push(intakeUrl);
@@ -39,11 +35,9 @@ export const CompletionStep: React.FC<CompletionStepProps> = ({ intakeUrl, sourc
     };
 
     const handleRedirectToWebsite = () => {
-        trackCTAClick(
-            isSavingsFlow ? 'savings' : 'intake',
-            'Ga terug naar weheat.nl',
-            REDIRECT_URL
-        );
+        trackEvent(isSavingsFlow ? 'savings_cta_website' : 'intake_cta_website', {
+            destination: REDIRECT_URL
+        });
 
         window.location.href = REDIRECT_URL;
     };
